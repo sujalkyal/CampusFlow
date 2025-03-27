@@ -126,7 +126,7 @@ enum Status{
 
 model Submission {
   id        String   @id @default(uuid())
-  files      String[]
+  files     String[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   student_id String
