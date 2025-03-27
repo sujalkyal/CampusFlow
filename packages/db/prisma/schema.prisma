@@ -20,6 +20,10 @@ model Teacher {
   password  String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  dept_id   String
+  dept      Department @relation(fields: [dept_id], references: [id])
+  batches   String[]
+  subjects  Subject[]
 }
 
 model Student {
@@ -29,4 +33,104 @@ model Student {
   password  String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  dept_id   String
+  dept      Department @relation(fields: [dept_id], references: [id])
+  batch_id  String
+  batch     Batch @relation(fields: [batch_id], references: [id])
+  attendance Attendance[]
+  submissions Submission[]
+}
+
+model Department {
+  id        String   @id @default(uuid())
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  batches   Batch[]
+  teachers  Teacher[]
+  students  Student[]
+}
+
+model Batch {
+  id        String   @id @default(uuid())
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  students  Student[]
+  subjects  Subject[]
+  dept_id   String
+  dept      Department @relation(fields: [dept_id], references: [id])
+}
+
+model Subject {
+  id        String   @id @default(uuid())
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  batch_id  String
+  batch     Batch @relation(fields: [batch_id], references: [id])
+  teacher_id String
+  teacher    Teacher @relation(fields: [teacher_id], references: [id])
+  notes     Note[]
+  sessions  Session[]
+}
+
+model Note {
+  id        String   @id @default(uuid())
+  title     String?
+  description String?
+  files      String[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  subject_id String
+  subject    Subject @relation(fields: [subject_id], references: [id])
+}
+
+// model for a particular session of a subject at a particular date and time
+model Session {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  date      DateTime
+  subject_id String
+  subject    Subject @relation(fields: [subject_id], references: [id])
+  attendance Attendance[]
+  assignment_id String?
+}
+
+model Assignment {
+  id        String   @id @default(uuid())
+  title     String?
+  description String?
+  files      String[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  session_id String
+  endDate   DateTime
+  submissions Submission[]
+}
+
+model Attendance {
+  id        String   @id @default(uuid())
+  status    Status
+  student_id String
+  student    Student @relation(fields: [student_id], references: [id])
+  session_id String
+  session    Session @relation(fields: [session_id], references: [id])
+}
+
+enum Status{
+  PRESENT
+  ABSENT
+  LATE
+}
+
+model Submission {
+  id        String   @id @default(uuid())
+  files      String[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  student_id String
+  student    Student @relation(fields: [student_id], references: [id])
+  assignment_id String
+  assignment    Assignment @relation(fields: [assignment_id], references: [id])
 }
