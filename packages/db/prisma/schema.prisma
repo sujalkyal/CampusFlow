@@ -23,7 +23,7 @@ model Teacher {
   dept_id   String
   dept      Department @relation(fields: [dept_id], references: [id])
   batches   String[]
-  subjects  Subject[]
+  subjects  String[]
 }
 
 model Student {
@@ -69,8 +69,7 @@ model Subject {
   updatedAt DateTime @updatedAt
   batch_id  String
   batch     Batch @relation(fields: [batch_id], references: [id])
-  teacher_id String
-  teacher    Teacher @relation(fields: [teacher_id], references: [id])
+  teacher_id String?
   notes     Note[]
   sessions  Session[]
 }
