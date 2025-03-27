@@ -12,6 +12,9 @@
   "devDependencies": {
     "prisma": "^6.5.0"
   },
+  "exports": {
+    "./client": "./src/index.js"
+  },
   "dependencies": {
     "@prisma/client": "^6.5.0"
   }
