@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import '../../globals.css'
 
 export default function Signup() {
   const router = useRouter();
