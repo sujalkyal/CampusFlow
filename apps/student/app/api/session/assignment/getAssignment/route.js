@@ -3,7 +3,7 @@ import prisma from "@repo/db/client";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../../../lib/auth";
 
-export async function GET(req) {
+export async function POST(req) {
   try {
     const session = await getServerSession(authOptions);
     if (!session) {
@@ -27,8 +27,7 @@ export async function GET(req) {
 
     if (!assignments) {
       return NextResponse.json(
-        { message: "No assignments found" },
-        { status: 404 }
+        { message: "No assignments found" }
       );
     }
 
