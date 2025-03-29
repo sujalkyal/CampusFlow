@@ -13,7 +13,7 @@ export async function POST(req) {
             return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
         }
 
-        // get subject_id and note from json body
+        // get subject_id and date from json body
         const { subject_id,date } = await req.json();
 
         if (!subject_id || !date) {
