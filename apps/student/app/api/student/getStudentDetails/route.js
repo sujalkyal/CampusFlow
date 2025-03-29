@@ -1,4 +1,4 @@
-// returns student details for all students in the batch with that subject
+// route to get student details
 
 import { NextResponse } from "next/server";
 import prisma from "@repo/db/client";
@@ -12,22 +12,19 @@ export async function GET(request) {
     }
 
     try {
-        const { batch_id } = await request.json();
-
-        const students = await prisma.batch.findUnique({
-            where: {
-                id: batch_id,
-            },
+        const studentId = session.user.id;
+        const student = await prisma.student.findUnique({
+            where: { id: studentId },
             include: {
-                students: {
-                    include: {
-                        attendance: true,
-                    },
-                },
+                attendance: true,
             },
         });
 
-        return NextResponse.json(students, { status: 200 });
+        if (!student) {
+            return NextResponse.json({ message: "Student not found" }, { status: 404 });
+        }
+
+        return NextResponse.json(student, { status: 200 });
     } catch (error) {
         console.error("Error fetching student details:", error);
         return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });

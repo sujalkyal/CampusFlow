@@ -10,39 +10,11 @@ export async function GET(req) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const studentId = session.user.id;
-    if (!studentId) {
-      return NextResponse.json(
-        { message: "Student ID not found" },
-        { status: 400 }
-      );
-    }
-
-    //get the batch id of the student
-    const batch_id = await prisma.student.findUnique({
-      where: { id: studentId },
-      select: { batch_id: true },
-    });
-
-    if (!batch_id) {
-      return NextResponse.json(
-        { message: "Batch ID not found" },
-        { status: 400 }
-      );
-    }
-
-    const batchWithSubjects = await prisma.batch.findUnique({
-      where: { id: batch_id.id },
-      include: {
-        subjects: true,
-      },
-    });
-
-    const subjectIds = batchWithSubjects?.subjects.map((subject) => subject.id);
+    const { subject_id } = await req.json();
 
     const sessions = await prisma.session.findMany({
       where: {
-        subject_id: { in: subjectIds },
+        subject_id,
       },
     });
 
