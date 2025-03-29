@@ -4,10 +4,10 @@ import prisma from "@repo/db/client";
 export async function POST(req) {
     //get the subjects from all the batches in the department
     try {
-        // const session = await getServerSession(authOptions);
-        // if (!session) {
-        //     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-        // }
+        const session = await getServerSession(authOptions);
+        if (!session) {
+            return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+        }
 
         // get batch_id from json body
         const { batch_id } = await req.json();

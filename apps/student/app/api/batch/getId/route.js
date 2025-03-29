@@ -2,11 +2,11 @@
 
 import { NextResponse } from "next/server";
 import db from "@repo/db/client";
-import { authOptions } from "../../../lib/auth";
+import { authOptions } from "../../../lib/auth"
 import { getServerSession } from "next-auth/next";
 
 
-export async function GET(req) {
+export async function POST(req) {
   const session = await getServerSession(authOptions);
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
