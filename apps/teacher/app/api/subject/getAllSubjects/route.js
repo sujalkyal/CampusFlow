@@ -1,17 +1,15 @@
 import { NextResponse } from "next/server";
 import prisma from "@repo/db/client";
-import { getServerSession } from "next-auth";
-import { authOptions } from "../../../lib/auth";
 
-export async function GET(req) {
+export async function POST(req) {
     //get the subjects from all the batches in the department
     try {
-        const session = await getServerSession(authOptions);
-        if (!session) {
-            return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-        }
+        // const session = await getServerSession(authOptions);
+        // if (!session) {
+        //     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+        // }
 
-        // get dept_id from json body
+        // get batch_id from json body
         const { batch_id } = await req.json();
         if (!batch_id) {
             return NextResponse.json({ message: "Invalid request" }, { status: 400 });
