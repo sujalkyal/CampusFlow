@@ -1,35 +1,34 @@
-// returns student details for all students in the batch with that subject
-
 import { NextResponse } from "next/server";
 import prisma from "@repo/db/client";
-import { getServerSession } from "next-auth";
-import { authOptions } from "../../../lib/auth";
 
-export async function GET(request) {
-    const session = await getServerSession(authOptions);
-    if (!session) {
-        return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+export async function POST(request) {
+  try {
+    const body = await request.json().catch(() => null);
+    if (!body || !body.batch_id) {
+      return NextResponse.json({ message: "Missing or invalid batch_id" }, { status: 400 });
     }
 
-    try {
-        const { batch_id } = await request.json();
+    const { batch_id } = body;
 
-        const students = await prisma.batch.findUnique({
-            where: {
-                id: batch_id,
-            },
-            include: {
-                students: {
-                    include: {
-                        attendance: true,
-                    },
-                },
-            },
-        });
+    // Validate if batch exists
+    const batch = await prisma.batch.findUnique({
+      where: { id: batch_id },
+      include: {
+        students: {
+          include: {
+            attendance: true,
+          },
+        },
+      },
+    });
 
-        return NextResponse.json(students, { status: 200 });
-    } catch (error) {
-        console.error("Error fetching student details:", error);
-        return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
+    if (!batch) {
+      return NextResponse.json({ message: "Batch not found" }, { status: 404 });
     }
+
+    return NextResponse.json(batch.students, { status: 200 });
+  } catch (error) {
+    console.error("Error fetching student details:", error);
+    return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
+  }
 }
