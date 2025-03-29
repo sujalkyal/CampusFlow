@@ -2,13 +2,13 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import db from "@repo/db/client";
 import bcrypt from "bcrypt";
 
-export default authOptions = {
+export const authOptions = {
   providers: [
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        email: { label: "Email", type: "email", required: true },
-        password: { label: "Password", type: "password", required: true },
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
         if (!credentials.email || !credentials.password) {
@@ -28,15 +28,19 @@ export default authOptions = {
           throw new Error("Invalid credentials.");
         }
 
-        return {
-          user
-        };
+        return user;
       },
     }),
   ],
   callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+      }
+      return token;
+    },
     async session({ session, token }) {
-      session.user.id = token.sub;
+      session.user.id = token.id;
       return session;
     },
   },
