@@ -5,7 +5,7 @@ import prisma from "@repo/db/client";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../../../lib/auth";
 
-export async function GET(req) {
+export async function POST(req) {
     //get the notes for a subject
     try {
         const session = await getServerSession(authOptions);
