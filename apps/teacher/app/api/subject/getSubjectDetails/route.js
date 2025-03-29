@@ -13,7 +13,7 @@ export async function GET(req) {
             return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
         }
 
-        // get dept_id from json body
+        // get subject_id from json body
         const { subject_id } = await req.json();
         if (!subject_id) {
             return NextResponse.json({ message: "Invalid request" }, { status: 400 });
