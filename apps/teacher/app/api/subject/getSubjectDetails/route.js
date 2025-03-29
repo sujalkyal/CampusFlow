@@ -1,17 +1,15 @@
-// all the datails for dashboard
-
 import { NextResponse } from "next/server";
 import prisma from "@repo/db/client";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../../lib/auth";
 
-export async function GET(req) {
+export async function POST(req) {
     //get the subjects from all the batches in the department
     try {
-        const session = await getServerSession(authOptions);
-        if (!session) {
-            return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-        }
+        // const session = await getServerSession(authOptions);
+        // if (!session) {
+        //     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+        // }
 
         // get subject_id from json body
         const { subject_id } = await req.json();
