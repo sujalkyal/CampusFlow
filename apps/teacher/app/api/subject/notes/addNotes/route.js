@@ -1,5 +1,3 @@
-// incomplete code
-// create ne note for a subject
 
 import { NextResponse } from "next/server";
 import prisma from "@repo/db/client";
@@ -15,8 +13,8 @@ export async function POST(req) {
         }
 
         // get subject_id and note from json body
-        const { subject_id, files,  } = await req.json();
-        if (!subject_id || !note) {
+        const { title, description, subject_id } = await req.json();
+        if (!subject_id) {
             return NextResponse.json({ message: "Invalid request" }, { status: 400 });
         }
 
@@ -24,7 +22,8 @@ export async function POST(req) {
         const newNote = await prisma.note.create({
             data: {
                 subject_id: subject_id,
-                note: note
+                title: title ? title : null,
+                description: description ? description : null,
             }
         });
 

@@ -33,7 +33,7 @@ export async function POST(request) {
 
         // Validate batch
         const batch = await prisma.batch.findUnique({
-            where: { name: batch_name, dept_id: student.dept_id } // Ensure the batch belongs to the same department
+            where: { name: batch_name, dept_id: student.dept_id }
         });
 
         if (!batch) {
@@ -47,7 +47,7 @@ export async function POST(request) {
                 name,
                 email,
                 password: hashedPassword,
-                batch_id: batch.id // Update only the batch
+                batch_id: batch.id
             }
         });
 
