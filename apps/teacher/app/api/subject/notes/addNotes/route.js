@@ -13,8 +13,8 @@ export async function POST(req) {
         }
 
         // get subject_id and note from json body
-        const { title, description, subject_id } = await req.json();
-        if (!subject_id) {
+        const { title, description, subject_id, files } = await req.json();
+        if (!subject_id && !files) {
             return NextResponse.json({ message: "Invalid request" }, { status: 400 });
         }
 
@@ -24,6 +24,7 @@ export async function POST(req) {
                 subject_id: subject_id,
                 title: title ? title : null,
                 description: description ? description : null,
+                files: files ? files : [],
             }
         });
 
