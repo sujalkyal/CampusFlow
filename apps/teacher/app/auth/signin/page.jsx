@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import axios from "axios";
+import { signIn } from "next-auth/react";
 
 export default function Signin() {
   const router = useRouter();
@@ -12,17 +12,17 @@ export default function Signin() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    
-    try {
-      await axios.post("/api/auth/signin", {
-        email: form.email,
-        password: form.password
-      });
-      
-      // Redirect to dashboard or home page after successful login
+  
+    const res = await signIn("credentials", {
+      redirect: false,
+      email: form.email,
+      password: form.password,
+    });
+  
+    if (res?.error) {
+      setError(res.error);
+    } else {
       router.push("/");
-    } catch (error) {
-      setError(error.response?.data?.error || "Invalid email or password");
     }
   };
 
