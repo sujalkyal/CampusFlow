@@ -3,14 +3,14 @@ import prisma from "@repo/db/client";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../../lib/auth";
 
-export async function GET(req) {
+export async function GET() {
   try {
-    // const session = await getServerSession(authOptions);
-    // if (!session) {
-    //   return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    // }
+    const session = await getServerSession(authOptions);
+    if (!session) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
 
-    const studentId = "4e6cac3b-bb3d-4c0f-8d32-c64e096e668e";
+    const studentId = session?.user?.id;
     if (!studentId) {
       return NextResponse.json({ message: "Student ID not found" }, { status: 400 });
     }
@@ -26,16 +26,26 @@ export async function GET(req) {
     }
 
     // Get the subjects of the batch
-    const batch = await prisma.batch.findUnique({
-      where: { id: student.batch_id },
-      include: { subjects: true },
+    const subjects = await prisma.subject.findMany({
+      where: { batch_id: student.batch_id },
+      select: { id: true, name: true, teacher_id: true },
     });
 
-    if (!batch || !batch.subjects.length) {
-      return NextResponse.json({ message: "No subjects found" }, { status: 404 });
-    }
+    // Get teacher names and map them to subjects
+    const teacherIds = subjects.map((subject) => subject.teacher_id).filter(Boolean);
+    const teachers = await prisma.teacher.findMany({
+      where: { id: { in: teacherIds } },
+      select: { id: true, name: true },
+    });
 
-    return NextResponse.json(batch.subjects, { status: 200 });
+    const teacherMap = Object.fromEntries(teachers.map((teacher) => [teacher.id, teacher.name]));
+
+    const subjectsWithTeachers = subjects.map((subject) => ({
+      ...subject,
+      teacher_name: subject.teacher_id ? teacherMap[subject.teacher_id] || "Unknown" : "No Teacher",
+    }));
+
+    return NextResponse.json(subjectsWithTeachers, { status: 200 });
   } catch (error) {
     console.error("Error fetching subjects:", error);
     return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
