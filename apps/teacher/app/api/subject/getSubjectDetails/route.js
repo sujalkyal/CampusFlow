@@ -6,10 +6,10 @@ import { authOptions } from "../../../lib/auth";
 export async function POST(req) {
     //get the subjects from all the batches in the department
     try {
-        // const session = await getServerSession(authOptions);
-        // if (!session) {
-        //     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-        // }
+        const session = await getServerSession(authOptions);
+        if (!session) {
+            return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+        }
 
         // get subject_id from json body
         const { subject_id } = await req.json();

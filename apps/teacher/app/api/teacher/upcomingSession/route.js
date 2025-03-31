@@ -13,21 +13,36 @@ export async function GET() {
         const teacher_id = session.user.id;
 
         const teacher = await prisma.teacher.findUnique({
+            where: { id: teacher_id },
+          });
+          
+          if (!teacher || !teacher.subjects || teacher.subjects.length === 0) {
+            return NextResponse.json({ message: "No subjects found for the teacher" }, { status: 404 });
+          }
+          
+          const sessions = await prisma.session.findMany({
             where: {
-                id: teacher_id,
+              subject_id: {
+                in: teacher.subjects.id,
+              },
             },
-            include: {
-                subjects: true, // Include the related subjects
-            },
-        });
+          });
 
-        const sessions = await prisma.session.findMany({
+
+          const subjectDetails = await prisma.subject.findMany({
             where: {
-                subject_id: { in: teacher.subjects },
+              id: {
+                in: teacher.subjects,
+              },
             },
-        });
+            select: {
+              id: true,
+              name: true,
+            },
+          });
 
-        return NextResponse.json(sessions, { status: 200 });
+          return NextResponse.json({sessions, subjectDetails}, { status: 200 });
+          
     } catch (error) {
         return NextResponse.json({ message: error.message }, { status: 500 });
     }
