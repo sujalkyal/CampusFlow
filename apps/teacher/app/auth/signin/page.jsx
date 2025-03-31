@@ -14,13 +14,13 @@ export default function Signin() {
     setError("");
     
     try {
-      const response = await axios.post("/api/auth/signin", {
+      await axios.post("/api/auth/signin", {
         email: form.email,
         password: form.password
       });
       
       // Redirect to dashboard or home page after successful login
-      router.push("/dashboard");
+      router.push("/");
     } catch (error) {
       setError(error.response?.data?.error || "Invalid email or password");
     }
