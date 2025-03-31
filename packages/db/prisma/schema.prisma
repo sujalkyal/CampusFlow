@@ -88,6 +88,7 @@ model Note {
 model Session {
   id        String   @id @default(uuid())
   createdAt DateTime @default(now())
+  title     String?
   date      DateTime
   subject_id String
   subject    Subject @relation(fields: [subject_id], references: [id])
