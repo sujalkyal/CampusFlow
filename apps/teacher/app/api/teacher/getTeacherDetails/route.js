@@ -38,6 +38,26 @@ export async function GET(req) {
     });
     const dept_name = dept ? dept.name : "Unknown Department";
 
+    //get the batch name using the batch_id from the subejects and add them to the subjects array
+    const batchDetails = await prisma.batch.findMany({
+      where: {
+        id: {
+          in: subjects.map(subject => subject.batch_id),
+        },
+      },
+      select: {
+        id: true,
+        name: true,
+      },
+    });
+
+    const batchMap = new Map(batchDetails.map(batch => [batch.id, batch.name]));
+    subjects.forEach(subject => {
+      subject.batch_name = batchMap.get(subject.batch_id) || "Unknown Batch";
+    });
+
+    console.log(subjects);
+
     return NextResponse.json({user, subjects, dept_name}, { status: 200 });
   } catch (error) {
     console.error('API Error:', error);
