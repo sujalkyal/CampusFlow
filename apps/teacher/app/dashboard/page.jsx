@@ -102,7 +102,7 @@ const SubjectDashboard = () => {
               <div
                 key={index}
                 className="flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-indigo-100 transition cursor-pointer shadow-sm hover:shadow-md"
-                onClick={() => router.push(`/subjects/${subject.id}`)}
+                onClick={() => router.push(`/dashboard/subject/${subject.id}`)}
               >
                 <div className="w-16 h-16 mb-3 flex items-center justify-center bg-indigo-50 rounded-full">
                   <h3 className="font-medium text-gray-900">{subject.name}</h3>
