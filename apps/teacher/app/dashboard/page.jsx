@@ -76,7 +76,7 @@ const SubjectDashboard = () => {
                   <div 
                     key={index} 
                     className="border-b pb-4 cursor-pointer hover:bg-gray-100 p-2 rounded-lg" 
-                    onClick={() => router.push(`/sessions/${session.id}`)}
+                    onClick={() => router.push(`/dashboard/subject/session/${session.id}`)}
                   >
                     <div className="flex justify-between items-start">
                       <div>
