@@ -71,7 +71,7 @@ export default function Signup() {
         subjectIds: selectedSubjects,
       });
       alert("Signup successful! Redirecting to login...");
-      router.push("/api/auth/signin");
+      router.push("/auth/signin");
     } catch (error) {
       alert("Signup failed: " + (error.response?.data?.error || "An error occurred"));
     }
