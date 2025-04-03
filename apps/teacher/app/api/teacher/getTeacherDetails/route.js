@@ -56,7 +56,7 @@ export async function GET(req) {
       subject.batch_name = batchMap.get(subject.batch_id) || "Unknown Batch";
     });
 
-    //console.log(subjects);
+  
 
     return NextResponse.json({user, subjects, dept_name}, { status: 200 });
   } catch (error) {
