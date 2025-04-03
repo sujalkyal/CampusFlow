@@ -4,7 +4,6 @@ import { useEdgeStore } from '../app/lib/edgestore';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { set } from 'zod';
 
 const NotesViewPopUp = ({ note, onClose }) => {
   const [isOpen, setIsOpen] = useState(true);
