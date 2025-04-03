@@ -116,6 +116,7 @@ model Attendance {
   student    Student @relation(fields: [student_id], references: [id])
   session_id String
   session    Session @relation(fields: [session_id], references: [id])
+  @@unique([student_id, session_id])
 }
 
 enum Status{

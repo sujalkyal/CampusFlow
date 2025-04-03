@@ -37,8 +37,17 @@ export async function POST(req) {
             }
         });
 
+        const deptId = batch.dept_id
 
-        return NextResponse.json({batchName, students, subject}, { status: 200 });
+        const dept = await prisma.department.findUnique({
+            where: {
+                id: deptId,
+            }
+        });
+        const deptName = dept.name;
+
+
+        return NextResponse.json({batchName, students, subject, deptName}, { status: 200 });
     } catch (error) {
         return NextResponse.json({ message: error.message }, { status: 500 });
     }
