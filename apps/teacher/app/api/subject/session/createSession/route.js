@@ -8,13 +8,13 @@ import { authOptions } from "../../../../lib/auth";
 export async function POST(req) {
     //create a new session for a subject
     try {
-        // const session = await getServerSession(authOptions);
-        // if (!session) {
-        //     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-        // }
+        const session = await getServerSession(authOptions);
+        if (!session) {
+            return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+        }
 
         // get subject_id and date from json body
-        const { subject_id, date } = await req.json();
+        const { title, subject_id, date } = await req.json();
 
         if (!subject_id || !date) {
             return NextResponse.json({ message: "Invalid request" }, { status: 400 });
@@ -26,7 +26,8 @@ export async function POST(req) {
         const newSession = await prisma.session.create({
             data: {
                 subject_id: subject_id,
-                date: dateObject
+                date: dateObject,
+                title: title? title : "Untitled",
             }
         });
 
