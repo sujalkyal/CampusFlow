@@ -7,10 +7,10 @@ import { authOptions } from "../../../lib/auth";
 
 export async function POST(req) {
     try {
-        // const session = await getServerSession(authOptions);
-        // if (!session) {
-        //     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-        // }
+        const session = await getServerSession(authOptions);
+        if (!session) {
+            return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+        }
 
         // get subject_id from json body
         const { subject_id } = await req.json();
@@ -22,9 +22,6 @@ export async function POST(req) {
         const batch = await prisma.subject.findUnique({
             where: {
                 id: subject_id
-            },
-            include: {
-                batch_id: true
             }
         });
 
