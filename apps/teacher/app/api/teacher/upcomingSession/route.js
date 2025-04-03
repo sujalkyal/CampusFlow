@@ -16,7 +16,7 @@ export async function GET() {
             where: { id: teacher_id },
           });
           
-          if (!teacher || !teacher.subjects || teacher.subjects.length === 0) {
+          if (!teacher || !teacher.subjects) {
             return NextResponse.json({ message: "No subjects found for the teacher" }, { status: 404 });
           }
           
@@ -41,8 +41,6 @@ export async function GET() {
             },
           });
 
-
-
           //filter them by date and time
           const currentDate = new Date();
           const filteredSessions = sessions.filter(session => {
@@ -57,7 +55,7 @@ export async function GET() {
           filteredSessions.forEach(session => {
             session.subject_name = subjectMap.get(session.subject_id) || "Unknown Subject";
           });
-          
+
 
           return NextResponse.json({filteredSessions, subjectDetails}, { status: 200 });
           

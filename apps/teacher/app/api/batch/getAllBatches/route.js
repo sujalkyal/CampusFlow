@@ -12,6 +12,10 @@ export async function POST(req) {
         const batches = await prisma.batch.findMany({
             where: {
                 dept_id: dept_id
+            },
+            select: {
+                id:  true,
+                name: true
             }
         });
 

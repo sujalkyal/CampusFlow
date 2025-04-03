@@ -2,15 +2,16 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
+import EditTeacherPopup from '../../components/Popup';
 
 const SubjectDashboard = () => {
   const [teacher, setTeacher] = useState(null);
   const [subjects, setSubjects] = useState([]);
   const [dept, setDept] = useState(null);
   const [upcomingSessions, setUpcomingSessions] = useState([]);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
   const router = useRouter();
 
-  useEffect(() => {
     const fetchTeacherDetails = async () => {
         try {
           const teacherRes = await axios.get('/api/teacher/getTeacherDetails', {
@@ -20,13 +21,14 @@ const SubjectDashboard = () => {
           setTeacher(teacherRes.data.user);
           setSubjects(teacherRes.data.subjects);
           setDept(teacherRes.data.dept_name);
-          
+
+          console.log(subjects);
+
         } catch (error) {
           console.error('Error fetching data:', error.response?.data?.message || error.message);
         }
       };
-    fetchTeacherDetails();        
-  }, []);
+
 
   const fetchUpcomingSessions = async () => {
     try {
@@ -38,37 +40,54 @@ const SubjectDashboard = () => {
       console.error('Error fetching upcoming sessions:', error.response?.data?.message || error.message);
     }
   }
+
   useEffect(() => {
     fetchUpcomingSessions();
+    fetchTeacherDetails();
   }, []);
 
+
+  const handleEditClick = () => {
+    setIsPopupOpen(true);
+  };
+  
   return (
     <div className="min-h-screen p-6 bg-gradient-to-r from-pink-50 to-indigo-50">
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Two-Column Layout for Profile and Classes */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Teacher Profile Card */}
           {teacher && (
-            <div className="bg-white rounded-lg shadow-lg p-6 lg:col-span-1">
+            <div className="bg-white rounded-lg shadow-lg p-6 w-full">
               <div className="flex flex-col items-center lg:items-start lg:flex-row">
                 <div className="w-24 h-24 mb-4 lg:mb-0 lg:mr-6">
                   <img 
-                    src="/api/placeholder/96/96" 
+                    src={teacher.profilePic || "/api/placeholder/96/96"} 
                     alt="Teacher" 
                     className="w-full h-full rounded-full object-cover border-2 border-indigo-500"
                   />
                 </div>
                 <div className="text-center lg:text-left">
                   <h2 className="text-2xl font-bold text-indigo-800">{teacher.name}</h2>
-                  <p className="text-gray-600 mb-1">Email: {teacher.email}</p>
+                  <p className="text-gray-600">Email: {teacher.email}</p>
                   <p className="text-gray-600">Department: {dept}</p>
+                   <button onClick={handleEditClick} className="mt-4 px-4 py-2 bg-indigo-500 text-white rounded-lg shadow-md hover:bg-indigo-600">Edit Details</button>
+
+                  <div className="mt-4 space-y-2">
+                    {subjects.map((subject, index) => (
+                      <div key={index} className="flex items-center justify-between bg-gray-100 p-2 rounded-lg shadow-sm w-full space-x-6">
+                        <h3 className="font-medium text-gray-800">{subject.name}</h3>
+                        <p className="text-gray-500 text-sm">Batch: {subject.batch_name}</p>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
           )}
 
           {/* Scheduled Classes Card */}
-          <div className="bg-white rounded-lg shadow-lg p-6 lg:col-span-2">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-full">
             <h2 className="text-2xl font-bold text-indigo-800 mb-4">Scheduled Classes</h2>
             <div className="space-y-4">
               {upcomingSessions.length > 0 ? (
@@ -92,9 +111,9 @@ const SubjectDashboard = () => {
               )}
             </div>
           </div>
-        </div>
 
-        {/* Subject Selection Section */}
+          {/* Subject Selection Section */}
+        </div>
         <div className="bg-white rounded-lg shadow-lg p-6">
           <h2 className="text-2xl font-bold text-indigo-800 mb-6">Select Subject</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
@@ -112,6 +131,14 @@ const SubjectDashboard = () => {
             ))}
           </div>
         </div>
+
+        {isPopupOpen && (
+          <EditTeacherPopup
+            teacher={teacher}
+            isOpen={true}
+            onClose={() => setIsPopupOpen(false)}
+          />
+        )}
       </div>
     </div>
   );
