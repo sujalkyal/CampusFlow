@@ -1,4 +1,3 @@
-
 import { NextResponse } from "next/server";
 import prisma from "@repo/db/client";
 import { getServerSession } from "next-auth";
@@ -10,61 +9,64 @@ export async function POST(request) {
     if (!session) {
         return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
-    
+
     try {
         const teacherId = session.user.id;
         const { name, email, newPassword, oldPassword, dept_name, batches, subjects } = await request.json();
+        console.log('Request body:', { name, email, newPassword, oldPassword, dept_name, batches, subjects });
+        
 
-        const teacher = await prisma.teacher.findUnique({ where: { id: teacherId } });
-        if (!user) {
+        const teacher = await prisma.teacher.findFirst({ where: { id: teacherId } });
+        if (!teacher) {
             return NextResponse.json({ message: "Teacher not found" }, { status: 404 });
         }
 
-        // check old password
-        const isMatch = await bcrypt.compare(oldPassword, teacher.password);
-        if (!isMatch) {
-            return NextResponse.json({ message: "Old password is incorrect" }, { status: 400 });
+        if (oldPassword) {
+            const isMatch = await bcrypt.compare(oldPassword, teacher.password);
+            if (!isMatch) {
+                return NextResponse.json({ message: "Old password is incorrect" }, { status: 400 });
+            }
         }
 
-        // hash new password if provided
         let hashedPassword = teacher.password;
         if (newPassword) {
             hashedPassword = await bcrypt.hash(newPassword, 10);
         }
 
-        const department = await prisma.department.findUnique({ 
+        const department = await prisma.department.findFirst({
             where: { name: dept_name },
-            select: { id: true, batches: { select: { name: true } } }
+            select: { id: true, batches: { select: { id: true } } }
         });
-        
-        if (department.id === teacher.dept_id) {
-            // loop through batches array and check if a batch is included in the department.batches array , if not then delete that batch from batches array
-            const validBatches = department.batches.map(batch => batch.name);
-            const filteredBatches = batches.filter(batch => validBatches.includes(batch));
 
-            const validSubjects = await prisma.batch.findMany({
-                where: { name: { in: filteredBatches } },
-                select: { subjects: { select: { name: true } } }
-            });
-
-            const validSubjectsNames = validSubjects.flatMap(batch => batch.subjects.map(subject => subject.name));
-            const filteredSubjects = subjects.filter(subject => validSubjectsNames.includes(subject));
-
-            // update teacher details
-            const updatedTeacher = await prisma.teacher.update({
-                where: { id: teacherId },
-                data: {
-                    name,
-                    email,
-                    password: hashedPassword,
-                    batches: { set: filteredBatches },
-                    subjects: { set: filteredSubjects }
-                }
-            });
-
-            return NextResponse.json(updatedTeacher, { status: 200 });
+        if (!department) {
+            return NextResponse.json({ message: "Department not found" }, { status: 404 });
         }
-    
+
+        //check if batched are not null
+        if (!batches || batches.length === 0) {
+            return NextResponse.json({ message: "No batches provided" }, { status: 400 });
+        }
+        const validBatchIds = department.batches.map(batch => batch.id);
+        const filteredBatches = batches.filter(batchId => validBatchIds.includes(batchId));
+
+        if (filteredBatches.length === 0) {
+            return NextResponse.json({ message: "No valid batches found" }, { status: 400 });
+        }
+
+        // Check if subjects are not null
+        if (!subjects || subjects.length === 0) {
+            return NextResponse.json({ message: "No subjects provided" }, { status: 400 });
+        }
+
+        const validSubjects = await prisma.subject.findMany({
+            where: { batch_id: { in: filteredBatches } },
+            select: { id: true }
+        });
+
+        const validSubjectIds = validSubjects.map(subject => subject.id);
+        const filteredSubjects = subjects.filter(subjectId => validSubjectIds.includes(subjectId));
+
+        // Append new batches and subjects
         const updatedTeacher = await prisma.teacher.update({
             where: { id: teacherId },
             data: {
@@ -72,14 +74,20 @@ export async function POST(request) {
                 email,
                 password: hashedPassword,
                 dept_id: department.id,
-                batches: { set: batches },
-                subjects: { set: subjects }
+                batches: { set: filteredBatches },
+                subjects: { set: filteredSubjects }
             }
         });
 
+        // Assign teacher_id to newly added subjects
+        // await prisma.subject.updateMany({
+        //     where: { id: { in: filteredSubjects } },
+        //     data: { teacher_id: teacherId }
+        // });
+
         return NextResponse.json(updatedTeacher, { status: 200 });
     } catch (error) {
-        console.error("Error updating user:", error);
+        console.error("Error updating teacher:", error);
         return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
     }
 }

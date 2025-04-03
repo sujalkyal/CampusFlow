@@ -69,7 +69,6 @@ model Subject {
   updatedAt DateTime @updatedAt
   batch_id  String
   batch     Batch @relation(fields: [batch_id], references: [id])
-  teacher_id String?
   notes     Note[]
   sessions  Session[]
 }

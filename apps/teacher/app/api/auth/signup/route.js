@@ -33,16 +33,16 @@ export async function POST(request) {
     });
 
     // update teacher_id in subjects with subjectIds
-    await prisma.subject.updateMany({
-      where: {
-        id: {
-          in: subjectIds,
-        },
-      },
-      data: {
-        teacher_id: newTeacher.id,
-      },
-    });
+    // await prisma.subject.updateMany({
+    //   where: {
+    //     id: {
+    //       in: subjectIds,
+    //     },
+    //   },
+    //   data: {
+    //     teacher_id: newTeacher.id,
+    //   },
+    // });
 
     return NextResponse.json({ message: "Signup successful", user: newTeacher }, { status: 201 });
   } catch (error) {

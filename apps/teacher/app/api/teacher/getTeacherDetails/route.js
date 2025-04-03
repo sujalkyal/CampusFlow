@@ -26,7 +26,7 @@ export async function GET(req) {
     //get subject names for each of the subjects taught by the teacher
     const subjects = await prisma.subject.findMany({
       where: {
-        teacher_id: teacher_id,
+        id: { in: user.subjects },
       },
     });
 
@@ -51,14 +51,17 @@ export async function GET(req) {
       },
     });
 
+    console.log("Batch Details: ", batchDetails);
+    console.log("Subjects: ", subjects);
+    console.log("User : ", user);
+
+
     const batchMap = new Map(batchDetails.map(batch => [batch.id, batch.name]));
     subjects.forEach(subject => {
       subject.batch_name = batchMap.get(subject.batch_id) || "Unknown Batch";
     });
 
-  
-
-    return NextResponse.json({user, subjects, dept_name}, { status: 200 });
+    return NextResponse.json({user, subjects, dept_name, batchDetails, subjects}, { status: 200 });
   } catch (error) {
     console.error('API Error:', error);
     return NextResponse.json({ message: error.message }, { status: 500 });
