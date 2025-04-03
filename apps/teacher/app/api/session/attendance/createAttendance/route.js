@@ -19,7 +19,7 @@ export async function POST(request) {
       return NextResponse.json({ message: "Invalid status" }, { status: 400 });
     }
 
-    // Validate student and session existence
+    // Ensure student & session exist
     const studentExists = await prisma.student.findUnique({
       where: { id: student_id },
     });
@@ -34,38 +34,18 @@ export async function POST(request) {
       );
     }
 
-    const attendanceExists = await prisma.attendance.findUnique({
+    // Upsert attendance: update if exists, otherwise create
+    const attendance = await prisma.attendance.upsert({
       where: {
-        student_id : student_id,
+        student_id_session_id: { student_id, session_id }, // Uses unique constraint
       },
+      update: { status },
+      create: { student_id, session_id, status },
     });
 
-    let attendance = null;
-
-    if (attendanceExists) {
-      // Update existing attendance record
-      attendance = await prisma.attendance.update({
-        where: {
-          student_id : student_id,
-        },
-        data: {
-          status,
-        },
-      });
-    } else {
-      // Create new attendance record
-      attendance = await prisma.attendance.create({
-        data: {
-          student_id,
-          session_id,
-          status,
-        },
-      });
-    }
-
-    return NextResponse.json(attendance, { status: 201 });
+    return NextResponse.json(attendance, { status: 200 });
   } catch (error) {
-    console.error("Error creating attendance:", error);
+    console.error("Error creating/updating attendance:", error);
     return NextResponse.json(
       { message: "Internal Server Error" },
       { status: 500 }

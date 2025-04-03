@@ -7,12 +7,12 @@ import { useRouter, useParams } from 'next/navigation';
 
 const AttendanceTable = () => {
     const { id: sessionId } = useParams();
-    const [session, setSession] = useState(null);
     const [subjectId, setSubjectId] = useState(null);
     const [subjectName, setSubjectName] = useState(null);
     const [batchName, setBatchName] = useState(null);
     const [students, setStudents] = useState([]);
     const [attendance, setAttendance] = useState({});
+    const [deptName, setDeptName] = useState(null);
     const router = useRouter();
 
     const fetchSession = async () => {
@@ -22,7 +22,6 @@ const AttendanceTable = () => {
                 console.error('Invalid session data:', response.data);
                 return;
             }
-            setSession(response.data);
             setSubjectId(response.data.subject_id);
         } catch (error) {
             console.error('Error fetching session:', error);
@@ -40,6 +39,7 @@ const AttendanceTable = () => {
             setSubjectName(response.data.subject.name);
             setBatchName(response.data.batchName);
             setStudents(response.data.students || []);
+            setDeptName(response.data.deptName);
         } catch (error) {
             console.error('Error fetching batch:', error);
         }
@@ -69,14 +69,56 @@ const AttendanceTable = () => {
             console.error("Error marking attendance:", error);
         }
     };
+
+    const getAttendanceDetails = async () => {
+        try {
+            const response = await axios.post('/api/session/attendance/getAttendanceFromStudent', {
+                subject_id: subjectId,
+                students,
+            });
+    
+            const attendanceData = response.data;
+    
+            // Merge attendance details into students array
+            const updatedStudents = students.map(student => {
+                const details = attendanceData.find(data => data.id === student.id) || {};
+                return {
+                    ...student,
+                    presentDays: details.presentDays || 0,
+                    absentDays: details.absentDays || 0,
+                    lateDays: details.lateDays || 0,
+                };
+            });
+    
+            setStudents(updatedStudents);
+        } catch (error) {
+            console.error("Error fetching attendance details:", error);
+        }
+    };
+    
+    useEffect(() => {
+        if (students.length > 0 && subjectId) {
+            getAttendanceDetails();
+        }
+    }, [students, subjectId]);
     
 
     return (
         <div className="p-6 space-y-8 bg-gradient-to-b from-pink-100 to-pink-50 min-h-screen">
             <div className="p-6 bg-white shadow-lg rounded-lg border border-gray-200">
-                <h2 className="text-xl font-bold text-gray-800 mb-2">Department: Computer Science</h2>
+                <h2 className="text-xl font-bold text-gray-800 mb-2">Department: {deptName}</h2>
                 <p className="text-md text-gray-600 mb-1"><span className="font-semibold">Batch:</span> {batchName}</p>
                 <p className="text-md text-gray-600"><span className="font-semibold">Subject:</span> {subjectName}</p>
+            </div>
+
+            <div className="flex justify-between items-center bg-gradient-to-b from-pink-100 to-pink-50 p-4 ">
+                <h2 className="text-xl font-bold text-gray-800">Attendance</h2>
+                <button
+                    className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition duration-200"
+                    onClick={() => router.push(`/teacher/dashboard/subject/session/${sessionId}/attendance`)}
+                >
+                    View Attendance
+                </button>
             </div>
 
             <div className="bg-white shadow-lg rounded-xl overflow-hidden border border-gray-200">
