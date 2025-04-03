@@ -4,6 +4,8 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import NotesViewPopUp from '../../../../components/NotesViewPopUp';
+import AddSessionCard from '../../../../components/AddSessionComponent';
+import AddNoteCard from '../../../../components/AddNotesComponent';
 
 const Subject = () => {
   const themeColors = {
@@ -18,7 +20,37 @@ const Subject = () => {
   const [notes, setNotes] = useState([]);
   const [students, setStudents] = useState([]);
   const [selectedNote, setSelectedNote] = useState(null);
+  const [refresh, setRefresh] = useState(false);
+  const [refresh2, setRefresh2] = useState(false);
   const router = useRouter();
+
+  const handleSessionCreated = () => {
+    setRefresh((prev) => !prev); // Toggle state to trigger re-render
+  };
+
+  const handleNoteCreation = () => {
+    setRefresh2((prev) => !prev); // Toggle state to trigger re-render
+  };
+
+  useEffect(() => {
+    if (!subject_id) return;
+
+    const fetchData = async () => {
+      try {
+        // Fetch students
+        const studentsResponse = await axios.post('/api/subject/getStudents', { subject_id });
+
+        if (studentsResponse.status !== 200) throw new Error('Failed to fetch students');
+        const studentsData = studentsResponse.data;
+        setStudents(studentsData);
+
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    }
+
+    fetchData();
+  },[]);
 
   useEffect(() => {
     if (!subject_id) return;
@@ -31,21 +63,13 @@ const Subject = () => {
         const notesData = notesResponse.data;
         setNotes(notesData);
 
-        // Fetch students
-        const studentsResponse = await axios.post('/api/subject/getStudents', { subject_id });
-
-        if (studentsResponse.status !== 200) throw new Error('Failed to fetch students');
-        const studentsData = studentsResponse.data;
-        setStudents(studentsData);
-
       } catch (error) {
         console.error('Error fetching data:', error);
       }
     };
 
     fetchData();
-}, []);
-
+}, [refresh2]);
 
   useEffect(() => {
     const fetchSessions = async () => {
@@ -64,7 +88,7 @@ const Subject = () => {
     };
 
     fetchSessions();
-  }, []);
+  }, [refresh]);
 
   return (
     <div className="flex flex-col min-h-screen px-12 md:px-24" style={{ backgroundColor: themeColors.secondary }}>
@@ -83,6 +107,7 @@ const Subject = () => {
                     </div>
                   </button>
                 ))}
+              <AddSessionCard subject_id={subject_id} onSessionCreated={handleSessionCreated} />
             </div>
           </div>
 
@@ -99,6 +124,7 @@ const Subject = () => {
                   </div>
                 </button>
               ))}
+              <AddNoteCard subject_id={subject_id} onNoteCreated={handleNoteCreation} />
             </div>
           </div>
         </div>

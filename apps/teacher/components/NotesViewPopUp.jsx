@@ -26,7 +26,7 @@ const NotesViewPopUp = ({ note, onClose }) => {
         <div className="mb-4">
           {noteDetails.files && noteDetails.files.length > 0 ? (
             noteDetails.files.map((file, index) => (
-// correct it
+// code to display preview of files in the notes and option to add new files 
               <div key={index} className="mb-2">
                 <a href={file.url} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
                   {file.name}
