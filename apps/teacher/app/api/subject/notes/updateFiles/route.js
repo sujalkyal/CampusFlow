@@ -19,25 +19,13 @@ export async function POST(req) {
             return NextResponse.json({ message: "Invalid request" }, { status: 400 });
         }
 
-        // check if note exists
-        const note = await prisma.note.findUnique({
-            where: {
-                id: note_id,
-            },
-        });
-        if (!note) {
-            return NextResponse.json({ message: "Note not found" }, { status: 404 });
-        }
-
         // update the note with files
         const updatedNote = await prisma.note.update({
             where: {
                 id: note_id,
             },
             data: {
-                files: {
-                    set: [...note.files, ...files]
-                },
+                files: files
             },
         });
 
