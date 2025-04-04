@@ -23,6 +23,9 @@ const Subject = () => {
   const [refresh, setRefresh] = useState(false);
   const [refresh2, setRefresh2] = useState(false);
   const router = useRouter();
+  const [showAll, setShowAll] = useState(false);
+  const visibleStudents = showAll ? students : students.slice(0, 10);
+  let totalClasses = 0;
 
   const handleSessionCreated = () => {
     setRefresh((prev) => !prev); // Toggle state to trigger re-render
@@ -41,7 +44,8 @@ const Subject = () => {
         const studentsResponse = await axios.post('/api/subject/getStudents', { subject_id });
 
         if (studentsResponse.status !== 200) throw new Error('Failed to fetch students');
-        const studentsData = studentsResponse.data;
+        const studentsData = studentsResponse.data.students;
+        totalClasses = studentsResponse.data.sessionCount;
         setStudents(studentsData);
 
       } catch (error) {
@@ -132,9 +136,11 @@ const Subject = () => {
         {/* Student List (Right Side) */}
         <div className="w-full md:w-1/2">
           <div className="bg-white rounded-lg shadow p-4">
-            <h2 className="text-lg font-semibold mb-4" style={{ color: themeColors.primary }}>Student List</h2>
+            <h2 className="text-lg font-semibold mb-4" style={{ color: themeColors.primary }}>
+              Student List
+            </h2>
             <div className="space-y-2">
-              {students.map((student) => (
+              {visibleStudents.map((student) => (
                 <div key={student.id} className="flex items-center justify-between border-b pb-2 last:border-0">
                   <div className="flex items-center">
                     <div className="h-10 w-10 rounded-full overflow-hidden mr-3">
@@ -146,14 +152,23 @@ const Subject = () => {
                     </div>
                   </div>
                   <div>
-                    <span className="font-semibold" style={{ color: themeColors.primary }}>Total Attendance: {student.attendance.length}</span>
+                    <span className="font-semibold" style={{ color: themeColors.primary }}>
+                      Attendance: {student.attendance.length}/{totalClasses}
+                    </span>
                   </div>
                 </div>
               ))}
             </div>
-            <div className="mt-4 text-center">
-              <button className="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300">Show More</button>
-            </div>
+            {students.length > 10 && (
+              <div className="mt-4 text-center">
+                <button
+                  className="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300 hover:cursor-pointer"
+                  onClick={() => setShowAll(!showAll)}
+                >
+                  {showAll ? "Show Less" : "Show More"}
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
