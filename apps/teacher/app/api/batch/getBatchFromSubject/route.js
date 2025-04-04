@@ -11,7 +11,6 @@ export async function POST(req) {
         }
 
         const { subject_id } = await req.json();
-        console.log(subject_id);
 
         if (!subject_id) {
             return NextResponse.json({ message: "Invalid request" }, { status: 400 });
