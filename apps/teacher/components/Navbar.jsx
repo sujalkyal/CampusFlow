@@ -8,7 +8,7 @@ const Navbar = () => {
   
   return (
     <nav className="flex items-center justify-between px-6 py-4" style={{ backgroundColor: '#2F3C7E' }}>
-      {/* Logo and Brand Name */}
+      {/* Logo and Brand Name  haha*/}
       <Link href="/" className="flex items-center">
         <div className="w-10 h-10 mr-3 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'rgba(251, 234, 235, 0.2)' }}>
           <svg 
