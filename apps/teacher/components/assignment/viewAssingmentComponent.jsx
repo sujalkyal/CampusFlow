@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Trash2, Plus } from 'lucide-react'; // Importing icons
-import { useEdgeStore } from '../app/lib/edgestore';
+import { useEdgeStore } from '../../app/lib/edgestore';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';

@@ -2,7 +2,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@repo/db/client";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../../../lib/auth";
+import { authOptions } from "../../../../lib/auth";
 
 export async function POST(req) {
     const session = await getServerSession(authOptions);
@@ -12,19 +12,11 @@ export async function POST(req) {
 
     try{
         const { assignment_id, files } = await req.json();
+        console.log("Assignment ID:", assignment_id);
+        console.log("Files:", files);
 
         if (!assignment_id || !files) {
             return NextResponse.json({ message: "Missing required fields" }, { status: 400 });
-        }
-
-        // check is the assignment exists
-        const assignment = await prisma.assignment.findUnique({
-            where: {
-                id: assignment_id,
-            },
-        });
-        if (!assignment) {
-            return NextResponse.json({ message: "Assignment not found" }, { status: 404 });
         }
 
         // add the files to the existing assignment
@@ -33,9 +25,7 @@ export async function POST(req) {
                 id: assignment_id,
             },
             data: {
-                files: {
-                    set: [...assignment.files, ...files],
-                },
+                files: files
             },
         });
 

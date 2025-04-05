@@ -105,7 +105,7 @@ model Assignment {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   session_id String
-  endDate   DateTime
+  endDate   DateTime?
   submissions Submission[]
 }
 
