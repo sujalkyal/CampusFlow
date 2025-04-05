@@ -62,7 +62,7 @@ const SubjectDashboard = () => {
               <div className="flex flex-col items-center lg:items-start lg:flex-row">
                 <div className="w-24 h-24 mb-4 lg:mb-0 lg:mr-6">
                   <img 
-                    src={teacher.image || "/api/placeholder/96/96"} 
+                    src={teacher.profilePic || "/api/placeholder/96/96"} 
                     alt="Teacher" 
                     className="w-full h-full rounded-full object-cover border-2 border-indigo-500"
                   />
