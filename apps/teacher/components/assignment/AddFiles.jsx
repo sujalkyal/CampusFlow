@@ -16,7 +16,7 @@ const FilesUploadModal = ({ assignmentId, files, setFiles, onClose }) => {
   };
 
   const handleDelete = (file) => {
-    setFiles((prev) => prev.filter((f) => f.url !== file.url));
+    setFiles((prev) => prev.filter((f) => f !== file));
     setDeleteFiles((prev) => [...prev, file]);
     toast.success('File removed!');
   };
@@ -70,21 +70,20 @@ const FilesUploadModal = ({ assignmentId, files, setFiles, onClose }) => {
           <div className="grid grid-cols-3 gap-2">
             {files.length > 0 ? (
               files.map((file, index) => {
-                const fileName = null
                 return (
                   <div key={index} className="relative bg-gray-100/20 p-2 rounded-lg flex items-center justify-between w-26">
                     {/\.(jpeg|jpg|png|gif)$/.test(file) ? (
                       <img
                         src={file}
-                        alt={fileName}
+                        alt={file}
                         className="w-16 h-16 object-cover rounded-md cursor-pointer"
                         onClick={() => window.open(file, '_blank')}
                       />
-                    ) : file.url.endsWith('.pdf') ? (
+                    ) : file.endsWith('.pdf') ? (
                       <iframe
                         src={file}
                         className="w-16 h-16 border rounded-md cursor-pointer"
-                        title={fileName}
+                        title={'PDF File'}
                         onClick={() => window.open(file, '_blank')}
                       />
                     ) : (
@@ -94,7 +93,6 @@ const FilesUploadModal = ({ assignmentId, files, setFiles, onClose }) => {
                         rel="noopener noreferrer"
                         className="text-blue-500 hover:underline text-sm"
                       >
-                        {fileName}
                       </a>
                     )}
                     <button onClick={() => handleDelete(file)} className="absolute top-1 right-1 text-red-500 hover:text-red-700">

@@ -26,6 +26,8 @@ export async function POST(req) {
       },
     });
 
+    console.log("Assignment:", assignment);
+
     if (!assignment) {
       return NextResponse.json({ message: "Assignment not found" }, { status: 404 });
     }

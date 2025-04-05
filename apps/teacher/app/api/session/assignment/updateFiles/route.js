@@ -25,7 +25,7 @@ export async function POST(req) {
                 id: assignment_id,
             },
             data: {
-                files: files.url
+                files: files
             },
         });
 
