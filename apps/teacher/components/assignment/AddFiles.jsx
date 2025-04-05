@@ -73,7 +73,7 @@ const FilesUploadModal = ({ assignmentId, files, setFiles, onClose }) => {
                 const fileName = null
                 return (
                   <div key={index} className="relative bg-gray-100/20 p-2 rounded-lg flex items-center justify-between w-26">
-                    {file.match(/\.(jpeg|jpg|png|gif)$/) ? (
+                    {/\.(jpeg|jpg|png|gif)$/.test(file) ? (
                       <img
                         src={file}
                         alt={fileName}
