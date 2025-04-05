@@ -45,23 +45,11 @@ export async function GET() {
             select: {
                 id: true,
                 name: true,
-                teacher_id: true,
-            },
-        });
-
-        // Step 3: Fetch teacher details
-        const teacherIds = subjects.map(subject => subject.teacher_id).filter(Boolean);
-        const teachers = await prisma.teacher.findMany({
-            where: { id: { in: teacherIds } },
-            select: {
-                id: true,
-                name: true,
             },
         });
 
         // Step 4: Merge data correctly
         const subjectMap = Object.fromEntries(subjects.map(sub => [sub.id, sub]));
-        const teacherMap = Object.fromEntries(teachers.map(teacher => [teacher.id, teacher.name]));
 
         const formattedSessions = upcomingSessions.map(session => {
             const subject = subjectMap[session.subject_id];
@@ -69,8 +57,7 @@ export async function GET() {
                 id: session.id,
                 date: session.date,
                 title: session.title || "Untitled Session",
-                subject: subject?.name || "Unknown Subject",
-                teacher: subject?.teacher_id ? teacherMap[subject.teacher_id] || "TBA" : "TBA",
+                subject_name: subject?.name || "Unknown Subject",
             };
         });
 
