@@ -100,7 +100,19 @@ const AttendanceTable = () => {
         if (students.length > 0 && subjectId) {
             getAttendanceDetails();
         }
-    }, [students, subjectId]);
+    }, [subjectId]);
+
+    const createAssignment = async () => {
+        try {
+            const response = await axios.post('/api/session/assignment/createAssignment', {
+                session_id: sessionId,
+            });
+            console.log("Assignment created:", response.data);
+            router.push(`/dashboard/subject/session/assignment/${response.data.id}`);
+        } catch (error) {
+            console.error("Error creating assignment:", error);
+        }
+    }
     
 
     return (
@@ -115,9 +127,9 @@ const AttendanceTable = () => {
                 <h2 className="text-xl font-bold text-gray-800">Attendance</h2>
                 <button
                     className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition duration-200"
-                    onClick={() => router.push(`/teacher/dashboard/subject/session/${sessionId}/attendance`)}
+                    onClick={() => createAssignment()}
                 >
-                    View Attendance
+                    Add Assignment
                 </button>
             </div>
 

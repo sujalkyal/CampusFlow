@@ -10,25 +10,24 @@ export async function POST(req) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const { session_id } = await req.json();
+    const body = await req.json();
+    const { id, title, description, endDate } = body;
 
-    if (!session_id ) {
-      return NextResponse.json({ message: "Missing required fields" }, { status: 400 });
+    if (!id) {
+      return NextResponse.json({ message: "Assignment ID is required" }, { status: 400 });
     }
 
-    const newAssignment = await prisma.assignment.create({
+    const updatedAssignment = await prisma.assignment.update({
+      where: { id },
       data: {
-        session_id,
-        title: null,
-        description: null,
-        endDate:  null,
+        title,
+        description,
+        endDate: endDate ? new Date(endDate) : undefined,
       },
     });
 
-    return NextResponse.json(newAssignment, { status: 201 });
-
+    return NextResponse.json(updatedAssignment, { status: 200 });
   } catch (error) {
-    console.error("Error creating assignment:", error);
     return NextResponse.json({ message: error.message }, { status: 500 });
   }
 }
