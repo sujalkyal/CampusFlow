@@ -2,6 +2,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { signOut } from 'next-auth/react';
 
 const Navbar = () => {
   const router = useRouter();
@@ -35,14 +36,14 @@ const Navbar = () => {
           Dashboard
         </Link>
         <Link 
-          href="/about" 
+          href="/about"
           className="font-medium transition-colors duration-200 hover:opacity-80"
           style={{ color: '#FBEAEB' }}
         >
           About Us
         </Link>
         <Link 
-          href="/contact" 
+          href="/contact"
           className="font-medium transition-colors duration-200 hover:opacity-80"
           style={{ color: '#FBEAEB' }}
         >
@@ -64,7 +65,7 @@ const Navbar = () => {
           style={{ backgroundColor: '#FBEAEB', color: '#2F3C7E' }}
           onClick={() => {
             // Handle logout logic here
-            router.push('/logout');
+            signOut({ callbackUrl: '/auth/signin' }); // redirect after logout
           }}
         >
           <svg 
