@@ -28,24 +28,15 @@ export async function GET() {
     // Get the subjects of the batch
     const subjects = await prisma.subject.findMany({
       where: { batch_id: student.batch_id },
-      select: { id: true, name: true, teacher_id: true },
-    });
-
-    // Get teacher names and map them to subjects
-    const teacherIds = subjects.map((subject) => subject.teacher_id).filter(Boolean);
-    const teachers = await prisma.teacher.findMany({
-      where: { id: { in: teacherIds } },
       select: { id: true, name: true },
     });
 
-    const teacherMap = Object.fromEntries(teachers.map((teacher) => [teacher.id, teacher.name]));
+    const batch_name = await prisma.batch.findUnique({
+      where: { id: student.batch_id },
+      select: { name: true },
+    });
 
-    const subjectsWithTeachers = subjects.map((subject) => ({
-      ...subject,
-      teacher_name: subject.teacher_id ? teacherMap[subject.teacher_id] || "Unknown" : "No Teacher",
-    }));
-
-    return NextResponse.json(subjectsWithTeachers, { status: 200 });
+    return NextResponse.json({subjects, batch_name: batch_name.name}, { status: 200 });
   } catch (error) {
     console.error("Error fetching subjects:", error);
     return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });

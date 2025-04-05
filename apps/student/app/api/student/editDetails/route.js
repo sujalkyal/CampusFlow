@@ -12,7 +12,7 @@ export async function POST(request) {
 
     try {
         const studentId = session.user.id;
-        const { name, email, newPassword, oldPassword, batch_name } = await request.json();
+        const { name, email, newPassword, oldPassword, batch_id } = await request.json();
 
         const student = await prisma.student.findUnique({ where: { id: studentId } });
         if (!student) {
@@ -33,7 +33,7 @@ export async function POST(request) {
 
         // Validate batch
         const batch = await prisma.batch.findUnique({
-            where: { name: batch_name, dept_id: student.dept_id }
+            where: { id: batch_id, dept_id: student.dept_id }
         });
 
         if (!batch) {
