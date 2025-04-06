@@ -17,11 +17,25 @@ export async function POST(req) {
         return NextResponse.json({ message: "Missing required fields" }, { status: 400 });
     }
 
-    const submissionDetails = await prisma.submission.findMany({
+    const studentSubmissions = await prisma.submission.findMany({
         where: {
             assignment_id: assignment_id,
+        },
+        select: {
+            student_id: true
         }
     });
 
-    return NextResponse.json(submissionDetails, { status: 200 });
+    console.log(" Student Submissions :  ", studentSubmissions);
+
+    const students = await prisma.student.findMany({
+        where: {
+            id: {
+                in: studentSubmissions.map(submission => submission.student_id),
+            },
+        },
+    });
+
+    console.log(" Students :  ", students);
+    return NextResponse.json(students, { status: 200 });
 }
