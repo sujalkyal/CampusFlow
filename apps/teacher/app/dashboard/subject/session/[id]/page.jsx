@@ -100,7 +100,7 @@ const AttendanceTable = () => {
         if (students.length > 0 && subjectId) {
             getAttendanceDetails();
         }
-    }, [subjectId]);
+    }, [subjectId, students]);
 
     const createAssignment = async () => {
         try {
