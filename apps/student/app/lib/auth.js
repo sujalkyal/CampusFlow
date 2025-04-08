@@ -32,21 +32,20 @@ export const authOptions = {
       },
     }),
   ],
-  callbacks : {
+  callbacks: {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        token.email = user.email;
       }
       return token;
     },
     async session({ session, token }) {
-      if (token) {
-        session.user.id = token.id;
-        session.user.email = token.email;
-      }
+      session.user.id = token.id;
       return session;
     },
   },
   secret: process.env.NEXTAUTH_SECRET || "secret",
+  pages: {
+    signIn: "/auth/signin", // Specify the path to your custom sign-in page
+  },
 };
