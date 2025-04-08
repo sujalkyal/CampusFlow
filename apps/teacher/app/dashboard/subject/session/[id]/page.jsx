@@ -104,15 +104,27 @@ const AttendanceTable = () => {
 
     const createAssignment = async () => {
         try {
-            const response = await axios.post('/api/session/assignment/createAssignment', {
-                session_id: sessionId,
+          // First, check if assignment already exists for the session
+          const checkResponse = await axios.post('/api/session/assignment/checkAssignment', {
+            session_id: sessionId,
+          });
+      
+          if (checkResponse.data.exists) {
+            // If assignment exists, redirect to it
+            router.push(`/dashboard/subject/session/assignment/${checkResponse.data.assignmentId}`);
+          } else {
+            // Otherwise, create a new assignment
+            const createResponse = await axios.post('/api/session/assignment/createAssignment', {
+              session_id: sessionId,
             });
-            console.log("Assignment created:", response.data);
-            router.push(`/dashboard/subject/session/assignment/${response.data.id}`);
+            console.log("Assignment created:", createResponse.data);
+            router.push(`/dashboard/subject/session/assignment/${createResponse.data.id}`);
+          }
         } catch (error) {
-            console.error("Error creating assignment:", error);
+          console.error("Error handling assignment:", error);
         }
-    }
+      };
+      
     
 
     return (
@@ -129,7 +141,7 @@ const AttendanceTable = () => {
                     className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition duration-200"
                     onClick={() => createAssignment()}
                 >
-                    Add Assignment
+                    Assignment
                 </button>
             </div>
 

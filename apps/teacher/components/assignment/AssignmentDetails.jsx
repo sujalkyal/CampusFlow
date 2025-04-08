@@ -11,8 +11,7 @@ export default function AssignmentDetails() {
     totalPoints: '',
     instructions: ''
   });
-
-  const [loading, setLoading] = useState(true);
+ 
   const params = useParams();
   const assignmentId = params?.id;
 
@@ -24,10 +23,12 @@ export default function AssignmentDetails() {
           assignment_id: assignmentId
         });
         setFormData({
-          title: res.data.title,
+          title: res.data.title || "",
           dueDate: res.data.endDate?.split("T")[0] || "",
           instructions: res.data.description || "",
+          totalPoints: "100", // or res.data.totalPoints || "100"
         });
+        
       } catch (err) {
         console.error("Failed to load assignment", err);
       }
