@@ -27,6 +27,7 @@
     "axios": "^1.8.4",
     "bcrypt": "^5.1.1",
     "dayjs": "^1.11.13",
+    "framer-motion": "^12.6.3",
     "lucide-react": "^0.487.0",
     "next-auth": "^4.24.11",
     "react-toastify": "^11.0.5",
