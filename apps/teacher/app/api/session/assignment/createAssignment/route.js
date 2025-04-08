@@ -25,6 +25,12 @@ export async function POST(req) {
       },
     });
 
+    const updatedSession = await prisma.session.update({
+      where: { id: session_id },
+      data: { assignment_id: newAssignment.id },
+    });
+
+
     return NextResponse.json(newAssignment, { status: 201 });
 
   } catch (error) {
