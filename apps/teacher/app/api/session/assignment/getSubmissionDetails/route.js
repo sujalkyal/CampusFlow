@@ -26,7 +26,7 @@ export async function POST(req) {
         }
     });
 
-    console.log(" Student Submissions :  ", studentSubmissions);
+    //console.log(" Student Submissions :  ", studentSubmissions);
 
     const students = await prisma.student.findMany({
         where: {
@@ -36,6 +36,6 @@ export async function POST(req) {
         },
     });
 
-    console.log(" Students :  ", students);
+    //console.log(" Students :  ", students);
     return NextResponse.json(students, { status: 200 });
 }

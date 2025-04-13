@@ -12,7 +12,7 @@ export async function POST(req) {
     }
 
     const { assignment_id } = await req.json();
-    console.log("Assignment ID:", assignment_id);
+    //console.log("Assignment ID:", assignment_id);
 
     if (!assignment_id) {
       return NextResponse.json({ message: "Missing assignment_id" }, { status: 400 });
@@ -27,7 +27,7 @@ export async function POST(req) {
       },
     });
 
-    console.log("Assignment:", assignment);
+    //console.log("Assignment:", assignment);
 
     if (!assignment) {
       return NextResponse.json({ message: "Assignment not found" }, { status: 404 });

@@ -58,7 +58,7 @@ const AddSessionCard = ({ subject_id, onSessionCreated }) => {
         {!showPopup ? (
           <motion.button
             onClick={() => setShowPopup(true)}
-            className="w-full h-full p-4 rounded-xl border-2 border-dashed flex flex-col items-center justify-center transition-colors duration-300"
+            className="w-full h-full p-4 rounded-xl border-2 border-dashed flex flex-col items-center justify-center transition-colors duration-300 hover:cursor-pointer"
             style={{ 
               borderColor: themeColors.accent,
               backgroundColor: 'rgba(58, 49, 83, 0.2)',
@@ -132,7 +132,7 @@ const AddSessionCard = ({ subject_id, onSessionCreated }) => {
                       value={dateTime}
                       onChange={(e) => setDateTime(e.target.value)}
                       className="w-full p-3 rounded-lg focus:outline-none focus:ring-2 transition-all duration-300"
-                      style={{ 
+                      style={{
                         backgroundColor: 'rgba(58, 49, 83, 0.4)', 
                         color: themeColors.text,
                         border: `1px solid ${themeColors.accent}`,
@@ -146,7 +146,7 @@ const AddSessionCard = ({ subject_id, onSessionCreated }) => {
                 <div className="flex justify-end space-x-3 mt-8">
                   <motion.button 
                     onClick={handleClosePopup}
-                    className="px-5 py-2 rounded-lg"
+                    className="px-5 py-2 rounded-lg hover:cursor-pointer"
                     style={{ backgroundColor: 'rgba(58, 49, 83, 0.6)', color: themeColors.text }}
                     whileHover={{ scale: 1.05, backgroundColor: 'rgba(58, 49, 83, 0.8)' }}
                     whileTap={{ scale: 0.95 }}
@@ -156,7 +156,7 @@ const AddSessionCard = ({ subject_id, onSessionCreated }) => {
                   
                   <motion.button 
                     onClick={handleCreateSession}
-                    className="px-5 py-2 rounded-lg"
+                    className="px-5 py-2 rounded-lg hover:cursor-pointer"
                     style={{ backgroundColor: themeColors.primary, color: themeColors.text }}
                     whileHover={{ scale: 1.05, backgroundColor: '#6f53c2' }}
                     whileTap={{ scale: 0.95 }}

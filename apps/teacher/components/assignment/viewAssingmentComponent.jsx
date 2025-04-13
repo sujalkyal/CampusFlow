@@ -38,7 +38,7 @@ const NotesViewPopUp = ({ note, onClose }) => {
 
   const handleSubmit = async () => {
     try {
-      console.log('noteDetails: ', noteDetails); // Log the note details before sending
+      //console.log('noteDetails: ', noteDetails); // Log the note details before sending
 
       const response = await axios.post('/api/subject/notes/updateFiles', {
         note_id: noteDetails.id,
@@ -79,7 +79,7 @@ const NotesViewPopUp = ({ note, onClose }) => {
       }));
 
       toast.success('Files uploaded successfully!');
-      console.log('files: ', noteDetails.files); // Log the updated note details
+      //console.log('files: ', noteDetails.files); // Log the updated note details
     } catch (error) {
       toast.error('Error uploading file');
       console.error('Error uploading file:', error);

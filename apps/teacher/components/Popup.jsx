@@ -161,8 +161,8 @@ const EditTeacherPopup = ({ isOpen, onClose, teacher }) => {
       </select>
 
       <div className="flex justify-end space-x-2">
-        <button type="button" onClick={onClose} className="px-4 py-2 bg-gray-600 text-white rounded-lg">Cancel</button>
-        <button type="submit" className="px-4 py-2 bg-[#5f43b2] hover:bg-[#3a3153] transition text-white rounded-lg">Save</button>
+        <button type="button" onClick={onClose} className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:cursor-pointer">Cancel</button>
+        <button type="submit" className="px-4 py-2 bg-[#5f43b2] hover:bg-[#3a3153] transition text-white rounded-lg hover:cursor-pointer">Save</button>
       </div>
     </form>
   </motion.div>

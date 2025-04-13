@@ -34,7 +34,7 @@ export default function FilesUploadSection() {
           setSubmissionId(null);
         }
 
-        console.log("Submission id is : ", res.data);
+        //console.log("Submission id is : ", res.data);
       } catch (err) {
         console.error("Error fetching submission:", err);
       } finally {

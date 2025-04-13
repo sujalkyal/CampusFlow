@@ -12,8 +12,8 @@ export async function POST(req) {
 
     try{
         const { assignment_id, files } = await req.json();
-        console.log("Assignment ID:", assignment_id);
-        console.log("Files:", files);
+        //console.log("Assignment ID:", assignment_id);
+        //console.log("Files:", files);
 
         if (!assignment_id || !files) {
             return NextResponse.json({ message: "Missing required fields" }, { status: 400 });

@@ -89,7 +89,7 @@ export default function AssignmentDetails() {
           </motion.span>
           <motion.button
             onClick={() => setIsModalOpen(true)}
-            className="text-[#5f43b2] hover:bg-[#5f43b2]/20 hover:text-[#fefcfd] p-1 rounded transition-colors"
+            className="text-[#5f43b2] hover:bg-[#5f43b2]/20 hover:text-[#fefcfd] p-1 rounded transition-colors hover:cursor-pointer"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
@@ -154,7 +154,7 @@ export default function AssignmentDetails() {
                 <h3 className="text-lg font-medium text-[#fefcfd]">Edit Assignment Details</h3>
                 <motion.button 
                   onClick={() => setIsModalOpen(false)} 
-                  className="text-[#b1aebb] hover:text-[#fefcfd] p-1 rounded"
+                  className="text-[#b1aebb] hover:text-[#fefcfd] p-1 rounded hover:cursor-pointer"
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                 >
@@ -223,7 +223,7 @@ export default function AssignmentDetails() {
                   <motion.button
                     type="button"
                     onClick={() => setIsModalOpen(false)}
-                    className="px-4 py-2 bg-[#010101] border border-[#3a3153] rounded text-sm font-medium text-[#b1aebb] hover:text-[#fefcfd] shadow-sm"
+                    className="px-4 py-2 bg-[#010101] border border-[#3a3153] rounded text-sm font-medium text-[#b1aebb] hover:text-[#fefcfd] shadow-sm hover:cursor-pointer"
                     whileHover={{ backgroundColor: "#010101", scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
@@ -231,7 +231,7 @@ export default function AssignmentDetails() {
                   </motion.button>
                   <motion.button
                     type="submit"
-                    className="px-4 py-2 bg-[#5f43b2] border border-transparent rounded text-sm font-medium text-white hover:bg-[#5f43b2]/90 shadow-sm"
+                    className="px-4 py-2 bg-[#5f43b2] border border-transparent rounded text-sm font-medium text-white hover:bg-[#5f43b2]/90 shadow-sm hover:cursor-pointer"
                     whileHover={{ backgroundColor: "#6f53c2", scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
