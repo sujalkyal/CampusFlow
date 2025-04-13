@@ -1,7 +1,8 @@
 "use client";
 import { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation'; // For dynamic route param
+import { useParams } from 'next/navigation';
 import axios from 'axios';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function AssignmentDetails() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -61,116 +62,196 @@ export default function AssignmentDetails() {
     }
   };
   
-
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
+    <motion.div 
+      className=""
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+    >
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold text-[#2F3C7E]">Assignment Details</h2>
-        <div className="flex items-center space-x-2">
-          <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded">
-            Due: {formData.dueDate}
-          </span>
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="text-[#2F3C7E] hover:bg-[#2F3C7E] hover:text-white p-1 rounded transition-colors"
+        <motion.h2 
+          className="text-xl font-semibold text-[#fefcfd]"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2 }}
         >
+          Assignment Details
+        </motion.h2>
+        <div className="flex items-center space-x-2">
+          <motion.span 
+            className="bg-[#5f43b2]/30 text-[#fefcfd] text-xs font-medium px-2.5 py-1 rounded"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.3 }}
+          >
+            Due: {formData.dueDate}
+          </motion.span>
+          <motion.button
+            onClick={() => setIsModalOpen(true)}
+            className="text-[#5f43b2] hover:bg-[#5f43b2]/20 hover:text-[#fefcfd] p-1 rounded transition-colors"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
               <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
             </svg>
-          </button>
+          </motion.button>
         </div>
       </div>
   
-      <div className="space-y-3">
-        <div className="flex items-start text-gray-700">
-          <strong className="mr-2">Title:</strong> {formData.title}
+      <motion.div 
+        className="space-y-3 mt-2"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.4 }}
+      >
+        <div className="flex items-start text-[#fefcfd] bg-[#010101]/30 p-3 rounded">
+          <strong className="mr-2 min-w-20">Title:</strong> 
+          <span className="text-[#b1aebb]">{formData.title}</span>
         </div>
-        <div className="flex items-start text-gray-700">
-          <strong className="mr-2">Due Date:</strong> {formData.dueDate}
+        <div className="flex items-start text-[#fefcfd] bg-[#010101]/30 p-3 rounded">
+          <strong className="mr-2 min-w-20">Due Date:</strong> 
+          <span className="text-[#b1aebb]">{formData.dueDate}</span>
         </div>
-        <div className="flex items-start text-gray-700">
-          <strong className="mr-2">Total Points:</strong> 100
+        <div className="flex items-start text-[#fefcfd] bg-[#010101]/30 p-3 rounded">
+          <strong className="mr-2 min-w-20">Total Points:</strong> 
+          <span className="text-[#b1aebb]">100</span>
         </div>
-      </div>
+      </motion.div>
   
-      <div className="mt-6">
-        <h3 className="text-gray-700 font-medium mb-2">Instructions:</h3>
-        <p className="text-gray-600 whitespace-pre-line">{formData.instructions}</p>
-      </div>
+      <motion.div 
+        className="mt-6"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.5 }}
+      >
+        <h3 className="text-[#fefcfd] font-medium mb-2 flex items-center">
+          <span className="inline-block w-1 h-4 bg-[#5f43b2] mr-2"></span>
+          Instructions:
+        </h3>
+        <div className="bg-[#010101]/40 p-4 rounded border border-[#3a3153]/50">
+          <p className="text-[#b1aebb] whitespace-pre-line">{formData.instructions}</p>
+        </div>
+      </motion.div>
   
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-medium text-[#2F3C7E]">Edit Assignment Details</h3>
-              <button onClick={() => setIsModalOpen(false)} className="text-gray-500 hover:text-gray-700">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-  
-            <form onSubmit={handleSubmit}>
-              <div className="mb-4">
-                <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">Assignment Title</label>
-                <input
-                  type="text"
-                  id="title"
-                  name="title"
-                  value={formData.title}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-[#2F3C7E] focus:border-[#2F3C7E]"
-                  required
-                />
-              </div>
-  
-              <div className="mb-4">
-                <label htmlFor="dueDate" className="block text-sm font-medium text-gray-700 mb-1">Due Date</label>
-                <input
-                  type="date"
-                  id="dueDate"
-                  name="dueDate"
-                  value={formData.dueDate}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-[#2F3C7E] focus:border-[#2F3C7E]"
-                  required
-                />
-              </div>
-  
-  
-              <div className="mb-4">
-                <label htmlFor="instructions" className="block text-sm font-medium text-gray-700 mb-1">Instructions</label>
-                <textarea
-                  id="instructions"
-                  name="instructions"
-                  value={formData.instructions}
-                  onChange={handleChange}
-                  rows="4"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-[#2F3C7E] focus:border-[#2F3C7E]"
-                  required
-                ></textarea>
-              </div>
-  
-              <div className="flex justify-end space-x-3">
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+      <AnimatePresence>
+        {isModalOpen && (
+          <motion.div 
+            className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 px-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div 
+              className="bg-[#1a1a24] rounded-lg shadow-xl p-6 w-full max-w-md border border-[#3a3153]"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ type: "spring", damping: 20 }}
+            >
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-medium text-[#fefcfd]">Edit Assignment Details</h3>
+                <motion.button 
+                  onClick={() => setIsModalOpen(false)} 
+                  className="text-[#b1aebb] hover:text-[#fefcfd] p-1 rounded"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
                 >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-[#2F3C7E] border border-transparent rounded-md text-sm font-medium text-white hover:bg-opacity-90"
-                >
-                  Save Changes
-                </button>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </motion.button>
               </div>
-            </form>
-          </div>
-        </div>
-      )}
-    </div>
+  
+              <form onSubmit={handleSubmit}>
+                <div className="mb-4">
+                  <label htmlFor="title" className="block text-sm font-medium text-[#fefcfd] mb-1">Assignment Title</label>
+                  <input
+                    type="text"
+                    id="title"
+                    name="title"
+                    value={formData.title}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 bg-[#010101] border border-[#3a3153] rounded focus:outline-none focus:ring-1 focus:ring-[#5f43b2] text-[#fefcfd]"
+                    required
+                  />
+                </div>
+  
+                <div className="mb-4">
+                  <label htmlFor="dueDate" className="block text-sm font-medium text-[#fefcfd] mb-1">Due Date</label>
+                  <input
+                    type="date"
+                    id="dueDate"
+                    name="dueDate"
+                    value={formData.dueDate}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 bg-[#010101] border border-[#3a3153] rounded focus:outline-none focus:ring-1 focus:ring-[#5f43b2] text-[#fefcfd] calendar-dark"
+                    required
+                    style={{
+                      colorScheme: 'dark'
+                    }}
+                  />
+                </div>
+  
+                <div className="mb-4">
+                  <label htmlFor="totalPoints" className="block text-sm font-medium text-[#fefcfd] mb-1">Total Points</label>
+                  <input
+                    type="number"
+                    id="totalPoints"
+                    name="totalPoints"
+                    value="100"
+                    disabled
+                    className="w-full px-3 py-2 bg-[#010101]/50 border border-[#3a3153] rounded text-[#b1aebb]"
+                  />
+                </div>
+  
+                <div className="mb-4">
+                  <label htmlFor="instructions" className="block text-sm font-medium text-[#fefcfd] mb-1">Instructions</label>
+                  <textarea
+                    id="instructions"
+                    name="instructions"
+                    value={formData.instructions}
+                    onChange={handleChange}
+                    rows="4"
+                    className="w-full px-3 py-2 bg-[#010101] border border-[#3a3153] rounded focus:outline-none focus:ring-1 focus:ring-[#5f43b2] text-[#fefcfd]"
+                    required
+                  ></textarea>
+                </div>
+  
+                <div className="flex justify-end space-x-3 mt-6">
+                  <motion.button
+                    type="button"
+                    onClick={() => setIsModalOpen(false)}
+                    className="px-4 py-2 bg-[#010101] border border-[#3a3153] rounded text-sm font-medium text-[#b1aebb] hover:text-[#fefcfd] shadow-sm"
+                    whileHover={{ backgroundColor: "#010101", scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    Cancel
+                  </motion.button>
+                  <motion.button
+                    type="submit"
+                    className="px-4 py-2 bg-[#5f43b2] border border-transparent rounded text-sm font-medium text-white hover:bg-[#5f43b2]/90 shadow-sm"
+                    whileHover={{ backgroundColor: "#6f53c2", scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    Save Changes
+                  </motion.button>
+                </div>
+              </form>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Add global styles for dark mode calendar */}
+      <style jsx global>{`
+        /* Ensure the calendar dropdown is properly styled */
+        input[type="date"]::-webkit-calendar-picker-indicator {
+          filter: invert(1);
+          cursor: pointer;
+        }
+      `}</style>
+    </motion.div>
   );
-  
 }
