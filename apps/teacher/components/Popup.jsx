@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { motion } from "framer-motion";
 
 const EditTeacherPopup = ({ isOpen, onClose, teacher }) => {
     const [formData, setFormData] = useState({
@@ -118,37 +119,55 @@ const EditTeacherPopup = ({ isOpen, onClose, teacher }) => {
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
-            <div className="bg-white p-6 rounded-lg shadow-lg w-96">
-                <h2 className="text-xl font-bold mb-4">Edit Teacher Details</h2>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <input type="text" name="name" value={formData.name} onChange={handleChange} className="w-full p-2 border rounded-lg" placeholder="Name" required />
-                    <input type="email" name="email" value={formData.email} onChange={handleChange} className="w-full p-2 border rounded-lg" placeholder="Email" required />
-                    <input type="password" name="oldPassword" value={formData.oldPassword} onChange={handleChange} className="w-full p-2 border rounded-lg" placeholder="Old Password" required />
-                    <input type="password" name="newPassword" value={formData.newPassword} onChange={handleChange} className="w-full p-2 border rounded-lg" placeholder="New Password" />
-                    <select name="dept_id" value={formData.dept_id} onChange={handleDepartmentChange} className="w-full p-2 border rounded-lg" required>
-                        <option value="" disabled>Select Department</option>
-                        {departments.map((dept) => (
-                            <option key={dept.id} value={dept.id}>{dept.name}</option>
-                        ))}
-                    </select>
-                    <select name="batches" multiple onChange={handleBatchChange} className="w-full p-2 border rounded-lg">
-                        {batches.map((batch) => (
-                            <option key={batch.id} value={batch.id}>{batch.name}</option>
-                        ))}
-                    </select>
-                    <select name="subjects" multiple onChange={handleSubjectChange} className="w-full p-2 border rounded-lg">
-                        {subjects.map((subject) => (
-                            <option key={subject.id} value={subject.id}>{subject.name}</option>
-                        ))}
-                    </select>
-                    <div className="flex justify-end space-x-2">
-                        <button type="button" onClick={onClose} className="px-4 py-2 bg-gray-500 text-white rounded-lg">Cancel</button>
-                        <button type="submit" className="px-4 py-2 bg-indigo-500 text-white rounded-lg">Save</button>
-                    </div>
-                </form>
-            </div>
-        </div>
+        <div className="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-md z-50">
+  <motion.div 
+    className="bg-gradient-to-br from-[#2f2f45] to-[#1e1e2f] text-[#fefdfd] p-6 rounded-2xl shadow-2xl w-full max-w-md"
+    initial={{ scale: 0.95, opacity: 0 }}
+    animate={{ scale: 1, opacity: 1 }}
+    exit={{ scale: 0.95, opacity: 0 }}
+    transition={{ duration: 0.3 }}
+  >
+    <h2 className="text-2xl font-bold mb-4 text-center text-[#b1aebb]">Edit Teacher Details</h2>
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <input type="text" name="name" value={formData.name} onChange={handleChange} placeholder="Name" required
+        className="w-full p-2 bg-[#1e1e2f] border border-[#5f43b2] rounded-lg focus:outline-none" />
+      <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="Email" required
+        className="w-full p-2 bg-[#1e1e2f] border border-[#5f43b2] rounded-lg focus:outline-none" />
+      <input type="password" name="oldPassword" value={formData.oldPassword} onChange={handleChange} placeholder="Old Password" required
+        className="w-full p-2 bg-[#1e1e2f] border border-[#5f43b2] rounded-lg focus:outline-none" />
+      <input type="password" name="newPassword" value={formData.newPassword} onChange={handleChange} placeholder="New Password"
+        className="w-full p-2 bg-[#1e1e2f] border border-[#5f43b2] rounded-lg focus:outline-none" />
+
+      <select name="dept_id" value={formData.dept_id} onChange={handleDepartmentChange}
+        className="w-full p-2 bg-[#1e1e2f] border border-[#5f43b2] rounded-lg">
+        <option value="" disabled>Select Department</option>
+        {departments.map(dept => (
+          <option key={dept.id} value={dept.id}>{dept.name}</option>
+        ))}
+      </select>
+
+      <select multiple name="batches" onChange={handleBatchChange}
+        className="w-full p-2 bg-[#1e1e2f] border border-[#5f43b2] rounded-lg">
+        {batches.map(batch => (
+          <option key={batch.id} value={batch.id}>{batch.name}</option>
+        ))}
+      </select>
+
+      <select multiple name="subjects" onChange={handleSubjectChange}
+        className="w-full p-2 bg-[#1e1e2f] border border-[#5f43b2] rounded-lg">
+        {subjects.map(subject => (
+          <option key={subject.id} value={subject.id}>{subject.name}</option>
+        ))}
+      </select>
+
+      <div className="flex justify-end space-x-2">
+        <button type="button" onClick={onClose} className="px-4 py-2 bg-gray-600 text-white rounded-lg">Cancel</button>
+        <button type="submit" className="px-4 py-2 bg-[#5f43b2] hover:bg-[#3a3153] transition text-white rounded-lg">Save</button>
+      </div>
+    </form>
+  </motion.div>
+</div>
+
     );
 };
 

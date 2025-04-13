@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Trash2, Plus } from 'lucide-react'; // Importing icons
+import { Trash2, Plus, File, X } from 'lucide-react'; // Added File and X icons
 import { useEdgeStore } from '../app/lib/edgestore';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { motion, AnimatePresence } from 'framer-motion'; // Added framer-motion
 
 const NotesViewPopUp = ({ note, onClose }) => {
   const [isOpen, setIsOpen] = useState(true);
@@ -89,87 +90,133 @@ const NotesViewPopUp = ({ note, onClose }) => {
   if (!isOpen || !noteDetails) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-      <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md relative">
-        <h2 className="text-xl font-semibold mb-4">{noteDetails.title}</h2>
-        <p className="text-gray-700 mb-4">{noteDetails.description}</p>
-        
-        <div className="mb-4">
-          <h3 className="text-lg font-semibold mb-2">Files:</h3>
-          <div className="grid grid-cols-3 gap-2">
-            {noteDetails.files && noteDetails.files.length > 0 ? (
-              noteDetails.files.map((fileUrl, index) => {
-                const fileName = decodeURIComponent(fileUrl.split('/').pop()); // Extract file name
-
-                return (
-                  <div key={index} className="relative bg-gray-100/20 p-2 rounded-lg flex items-center justify-between w-26">
-                    {fileUrl.match(/\.(jpeg|jpg|png|gif)$/) ? (
-                      <img
-                        src={fileUrl}
-                        alt={fileName}
-                        className="w-16 h-16 object-cover rounded-md cursor-pointer"
-                        onClick={() => window.open(fileUrl, '_blank')}
-                      />
-                    ) : fileUrl.endsWith('.pdf') ? (
-                      <iframe
-                        src={fileUrl}
-                        className="w-16 h-16 border rounded-md cursor-pointer"
-                        title={fileName}
-                        onClick={() => window.open(fileUrl, '_blank')}
-                      />
-                    ) : (
-                      <a
-                        href={fileUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-500 hover:underline"
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-70"
+        >
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.9, opacity: 0 }}
+            transition={{ type: "spring", stiffness: 300, damping: 25 }}
+            className="bg-[#010101] rounded-lg shadow-2xl p-6 w-full max-w-md relative border border-[#3a3153]/30"
+          >
+            {/* Close button in top right */}
+            <button 
+              onClick={handleClose} 
+              className="absolute top-4 right-4 text-[#b1aebb] hover:text-[#fefcfd] transition-colors"
+            >
+              <X size={20} />
+            </button>
+            
+            <h2 className="text-xl font-semibold mb-2 text-[#fefcfd]">{noteDetails.title}</h2>
+            <p className="text-[#b1aebb] mb-6">{noteDetails.description}</p>
+            
+            <div className="mb-6">
+              <h3 className="text-md font-medium mb-3 text-[#5f43b2]">Files</h3>
+              <div className="grid grid-cols-3 gap-3">
+                {noteDetails.files && noteDetails.files.length > 0 ? (
+                  noteDetails.files.map((fileUrl, index) => {
+                    const fileName = decodeURIComponent(fileUrl.split('/').pop().substring(0, 12)); // Extract and truncate file name
+                    
+                    return (
+                      <motion.div 
+                        key={index} 
+                        whileHover={{ scale: 1.05 }}
+                        className="relative bg-[#3a3153]/30 p-2 rounded-lg group overflow-hidden"
                       >
-                        {fileName}
-                      </a>
-                    )}
-                    <button onClick={() => handleDelete(fileUrl)} className="absolute top-1 right-1 text-red-500 hover:text-red-700 hover:cursor-pointer">
-                      <Trash2 size={18} />
-                    </button>
-                  </div>
-                );
-              })
-            ) : (
-              <p className="col-span-3 text-gray-500">No files available.</p>
-            )}
+                        {fileUrl.match(/\.(jpeg|jpg|png|gif)$/) ? (
+                          <div className="w-16 h-16 mx-auto">
+                            <img
+                              src={fileUrl}
+                              alt={fileName}
+                              className="w-full h-full object-cover rounded cursor-pointer"
+                              onClick={() => window.open(fileUrl, '_blank')}
+                            />
+                          </div>
+                        ) : fileUrl.endsWith('.pdf') ? (
+                          <div className="w-16 h-16 mx-auto bg-[#3a3153]/50 rounded flex items-center justify-center cursor-pointer"
+                               onClick={() => window.open(fileUrl, '_blank')}>
+                            <File size={24} className="text-[#5f43b2]" />
+                          </div>
+                        ) : (
+                          <div className="w-16 h-16 mx-auto bg-[#3a3153]/50 rounded flex items-center justify-center cursor-pointer"
+                               onClick={() => window.open(fileUrl, '_blank')}>
+                            <File size={24} className="text-[#5f43b2]" />
+                          </div>
+                        )}
+                        
+                        <p className="text-xs text-center mt-1 text-[#b1aebb] truncate">{fileName}</p>
+                        
+                        <motion.button
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9 }}
+                          onClick={() => handleDelete(fileUrl)} 
+                          className="absolute top-1 right-1 p-1 rounded-full bg-[#010101]/80 text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <Trash2 size={16} />
+                        </motion.button>
+                      </motion.div>
+                    );
+                  })
+                ) : (
+                  <p className="col-span-3 text-[#b1aebb] text-center">No files available</p>
+                )}
 
-            {/* Add File Button (Skeleton Box) */}
-            <label className="w-16 h-16 flex items-center justify-center border-2 border-dashed border-gray-400 rounded-md cursor-pointer hover:bg-gray-100 mt-2">
-              <input
-                type="file"
-                className="hidden"
-                multiple
-                onChange={(e) => handleFileUpload(e.target.files)}
-              />
-              <Plus size={24} className="text-gray-500" />
-            </label>
-          </div>
-        </div>
+                {/* Add File Button */}
+                <motion.label 
+                  whileHover={{ scale: 1.05, backgroundColor: 'rgba(95, 67, 178, 0.1)' }}
+                  whileTap={{ scale: 0.95 }}
+                  className="w-16 h-16 flex flex-col items-center justify-center border border-dashed border-[#5f43b2]/40 rounded cursor-pointer transition-colors mx-auto"
+                >
+                  <input
+                    type="file"
+                    className="hidden"
+                    multiple
+                    onChange={(e) => handleFileUpload(e.target.files)}
+                  />
+                  <Plus size={20} className="text-[#5f43b2] mb-1" />
+                  <span className="text-xs text-[#b1aebb]">Add file</span>
+                </motion.label>
+              </div>
+            </div>
 
-        <div className="flex justify-end space-x-2 mt-4">
-          <button 
-            onClick={handleClose} 
-            className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500"
-          >
-            Close
-          </button>
+            <div className="flex justify-end space-x-3 mt-6">
+              <motion.button 
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={handleClose} 
+                className="bg-[#3a3153] text-[#b1aebb] px-4 py-2 rounded hover:text-[#fefcfd] transition-colors"
+              >
+                Cancel
+              </motion.button>
 
-          <button 
-            onClick={handleSubmit} 
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-          >
-            Submit
-          </button>
-        </div>
-      </div>
+              <motion.button 
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={handleSubmit} 
+                className="bg-[#5f43b2] text-[#fefcfd] px-4 py-2 rounded"
+              >
+                Save Changes
+              </motion.button>
+            </div>
+          </motion.div>
 
-      {/* Toast Container */}
-      <ToastContainer position="top-right" autoClose={3000} />
-    </div>
+          {/* Customized Toast Container */}
+          <ToastContainer 
+            position="top-right" 
+            autoClose={3000}
+            toastClassName={() => 
+              "bg-[#3a3153] text-[#fefcfd] relative flex p-3 min-h-10 rounded-md justify-between overflow-hidden cursor-pointer mb-2"
+            }
+          />
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };
 

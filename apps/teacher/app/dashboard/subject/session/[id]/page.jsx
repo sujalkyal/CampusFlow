@@ -2,8 +2,9 @@
 import React from "react";
 import axios from 'axios';
 import { useEffect, useState } from 'react';
-import { CheckCircle, XCircle, Clock } from "lucide-react";
+import { CheckCircle, XCircle, Clock, BookOpen, ArrowRight } from "lucide-react";
 import { useRouter, useParams } from 'next/navigation';
+import { motion } from "framer-motion";
 
 const AttendanceTable = () => {
     const { id: sessionId } = useParams();
@@ -123,81 +124,145 @@ const AttendanceTable = () => {
         } catch (error) {
           console.error("Error handling assignment:", error);
         }
-      };
-      
+    };
     
+    // Animation variants
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        visible: { opacity: 1, transition: { staggerChildren: 0.05 } }
+    };
+    
+    const itemVariants = {
+        hidden: { y: 20, opacity: 0 },
+        visible: { y: 0, opacity: 1, transition: { type: "spring", stiffness: 100 } }
+    };
 
     return (
-        <div className="p-6 space-y-8 bg-gradient-to-b from-pink-100 to-pink-50 min-h-screen">
-            <div className="p-6 bg-white shadow-lg rounded-lg border border-gray-200">
-                <h2 className="text-xl font-bold text-gray-800 mb-2">Department: {deptName}</h2>
-                <p className="text-md text-gray-600 mb-1"><span className="font-semibold">Batch:</span> {batchName}</p>
-                <p className="text-md text-gray-600"><span className="font-semibold">Subject:</span> {subjectName}</p>
-            </div>
+        // Full dark mode background
+        <div className="min-h-screen bg-[#010101] text-[#fefcfd] p-4 md:p-6">
+            <motion.div 
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="mb-8"
+            >
+                <div className="bg-[#3a3153] rounded-xl p-6 shadow-lg border border-[#5f43b2]/30">
+                    <h2 className="text-2xl font-bold mb-4 text-[#fefcfd]">{subjectName}</h2>
+                    <div className="flex flex-col space-y-2">
+                        <div className="flex items-center">
+                            <span className="text-[#b1aebb] w-24">Department:</span>
+                            <span className="font-medium text-[#fefcfd]">{deptName}</span>
+                        </div>
+                        <div className="flex items-center">
+                            <span className="text-[#b1aebb] w-24">Batch:</span>
+                            <span className="font-medium text-[#fefcfd]">{batchName}</span>
+                        </div>
+                    </div>
+                </div>
+            </motion.div>
 
-            <div className="flex justify-between items-center bg-gradient-to-b from-pink-100 to-pink-50 p-4 ">
-                <h2 className="text-xl font-bold text-gray-800">Attendance</h2>
-                <button
-                    className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition duration-200"
+            <div className="flex justify-between items-center mb-6">
+                <div className="flex items-center">
+                    <motion.div
+                        initial={{ scale: 0.9 }}
+                        animate={{ scale: 1 }}
+                        transition={{ yoyo: Infinity, duration: 2 }}
+                    >
+                        <BookOpen className="mr-2 text-[#5f43b2]" size={24} />
+                    </motion.div>
+                    <h2 className="text-xl font-bold text-[#fefcfd]">Attendance</h2>
+                </div>
+                <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="bg-[#5f43b2] text-[#fefcfd] px-4 py-2 rounded-lg flex items-center space-x-2 shadow-md shadow-[#5f43b2]/20"
                     onClick={() => createAssignment()}
                 >
-                    Assignment
-                </button>
+                    <span>Assignment</span>
+                    <ArrowRight size={16} />
+                </motion.button>
             </div>
 
-            <div className="bg-white shadow-lg rounded-xl overflow-hidden border border-gray-200">
-                <table className="w-full border-collapse">
-                    <thead>
-                        <tr className="bg-gray-100 text-gray-800">
-                            <th className="p-4 text-left">#</th>
-                            <th className="p-4 text-left">Student Name</th>
-                            <th className="p-4 text-center">Attendance</th>
-                            <th className="p-4 text-center text-green-700">Present Days</th>
-                            <th className="p-4 text-center text-red-700">Absent Days</th>
-                            <th className="p-4 text-center text-yellow-700">Late Days</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {students.length > 0 ? (
-                            students.map((student, index) => (
-                                <tr key={student.id} className={`border-t ${index % 2 === 0 ? "bg-pink-50" : "bg-white"} hover:bg-pink-100`}>
-                                    <td className="p-4 text-center font-medium text-gray-700">{index + 1}</td>
-                                    <td className="p-4 text-blue-600 font-semibold">{student.name}</td>
-                                    <td className="p-4 text-center">
-                                        <div className="flex justify-center gap-2">
-                                            <button
-                                                className={`p-2 rounded-full transition ${attendance[student.id] === "present" ? "bg-green-500 text-white" : "bg-green-100 text-green-700"}`}
-                                                onClick={() => markAttendance(student.id, "present")}
-                                            >
-                                                <CheckCircle size={20} />
-                                            </button>
-                                            <button
-                                                className={`p-2 rounded-full transition ${attendance[student.id] === "absent" ? "bg-red-500 text-white" : "bg-red-100 text-red-700"}`}
-                                                onClick={() => markAttendance(student.id, "absent")}
-                                            >
-                                                <XCircle size={20} />
-                                            </button>
-                                            <button
-                                                className={`p-2 rounded-full transition ${attendance[student.id] === "late" ? "bg-yellow-500 text-white" : "bg-yellow-100 text-yellow-700"}`}
-                                                onClick={() => markAttendance(student.id, "late")}
-                                            >
-                                                <Clock size={20} />
-                                            </button>
+            <motion.div 
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+                className="space-y-4"
+            >
+                {students.length > 0 ? (
+                    students.map((student, index) => (
+                        <motion.div 
+                            key={student.id} 
+                            variants={itemVariants}
+                            className="bg-[#3a3153]/40 rounded-xl p-4 shadow-lg hover:shadow-xl hover:bg-[#3a3153]/60 transition-all duration-300 border border-[#5f43b2]/20"
+                        >
+                            <div className="flex flex-col md:flex-row md:items-center justify-between">
+                                <div className="flex-1">
+                                    <div className="flex items-center mb-2">
+                                        <span className="bg-[#5f43b2] text-[#fefcfd] w-8 h-8 rounded-full flex items-center justify-center mr-3 shadow-md shadow-[#5f43b2]/30">
+                                            {index + 1}
+                                        </span>
+                                        <h3 className="text-lg font-semibold text-[#fefcfd]">{student.name}</h3>
+                                    </div>
+                                    
+                                    <div className="grid grid-cols-3 gap-2 text-sm mt-2">
+                                        <div className="flex items-center">
+                                            <div className="w-3 h-3 rounded-full bg-green-400 mr-2"></div>
+                                            <span className="text-[#b1aebb]">Present: </span>
+                                            <span className="ml-1 font-bold text-green-400">{student.presentDays || 0}</span>
                                         </div>
-                                    </td>
-                                    <td className="p-4 text-center text-green-700 font-bold">{student.presentDays || 0}</td>
-                                    <td className="p-4 text-center text-red-500 font-bold">{student.absentDays || 0}</td>
-                                    <td className="p-4 text-center text-yellow-700 font-bold">{student.lateDays || 0}</td>
-                                </tr>
-                            ))
-                        ) : (
-                            <tr>
-                                <td colSpan="6" className="text-center p-6 text-gray-500">No students found</td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
-            </div>
+                                        <div className="flex items-center">
+                                            <div className="w-3 h-3 rounded-full bg-red-400 mr-2"></div>
+                                            <span className="text-[#b1aebb]">Absent: </span>
+                                            <span className="ml-1 font-bold text-red-400">{student.absentDays || 0}</span>
+                                        </div>
+                                        <div className="flex items-center">
+                                            <div className="w-3 h-3 rounded-full bg-yellow-400 mr-2"></div>
+                                            <span className="text-[#b1aebb]">Late: </span>
+                                            <span className="ml-1 font-bold text-yellow-400">{student.lateDays || 0}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div className="flex space-x-2 mt-4 md:mt-0">
+                                    <motion.button
+                                        whileHover={{ scale: 1.1 }}
+                                        whileTap={{ scale: 0.9 }}
+                                        className={`p-2 rounded-full ${attendance[student.id] === "present" ? "bg-green-500 text-[#fefcfd]" : "bg-green-500/20 text-green-400"} shadow-md`}
+                                        onClick={() => markAttendance(student.id, "present")}
+                                    >
+                                        <CheckCircle size={20} />
+                                    </motion.button>
+                                    <motion.button
+                                        whileHover={{ scale: 1.1 }}
+                                        whileTap={{ scale: 0.9 }}
+                                        className={`p-2 rounded-full ${attendance[student.id] === "absent" ? "bg-red-500 text-[#fefcfd]" : "bg-red-500/20 text-red-400"} shadow-md`}
+                                        onClick={() => markAttendance(student.id, "absent")}
+                                    >
+                                        <XCircle size={20} />
+                                    </motion.button>
+                                    <motion.button
+                                        whileHover={{ scale: 1.1 }}
+                                        whileTap={{ scale: 0.9 }}
+                                        className={`p-2 rounded-full ${attendance[student.id] === "late" ? "bg-yellow-500 text-[#fefcfd]" : "bg-yellow-500/20 text-yellow-400"} shadow-md`}
+                                        onClick={() => markAttendance(student.id, "late")}
+                                    >
+                                        <Clock size={20} />
+                                    </motion.button>
+                                </div>
+                            </div>
+                        </motion.div>
+                    ))
+                ) : (
+                    <motion.div 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="text-center p-10 bg-[#3a3153]/20 rounded-xl border border-[#5f43b2]/20"
+                    >
+                        <p className="text-[#b1aebb]">No students found</p>
+                    </motion.div>
+                )}
+            </motion.div>
         </div>
     );
 };
