@@ -3,16 +3,20 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
+import { motion, AnimatePresence } from 'framer-motion';
 import NotesViewPopUp from '../../../../components/NotesViewPopUp';
 import AddSessionCard from '../../../../components/AddSessionComponent';
 import AddNoteCard from '../../../../components/AddNotesComponent';
 
 const Subject = () => {
+  // Theme colors from provided image
   const themeColors = {
-    primary: '#2F3C7E',
-    secondary: '#FBEAEB',
-    white: '#FFFFFF',
-    black: '#000000',
+    primary: '#5f43b2', // Studio purple
+    secondary: '#010101', // Black
+    accent: '#3a3153', // Mystique
+    card: 'rgba(42, 42, 64, 0.4)',
+    text: '#fefdfD', // Soft Peach
+    faded: '#b1aebb' // Gray Powder
   };
 
   const { id: subject_id } = useParams();
@@ -27,65 +31,68 @@ const Subject = () => {
   const visibleStudents = showAll ? students : students.slice(0, 10);
   let totalClasses = 0;
 
-  const handleSessionCreated = () => {
-    setRefresh((prev) => !prev); // Toggle state to trigger re-render
-  };
+  const handleSessionCreated = () => setRefresh((prev) => !prev);
+  const handleNoteCreation = () => setRefresh2((prev) => !prev);
 
-  const handleNoteCreation = () => {
-    setRefresh2((prev) => !prev); // Toggle state to trigger re-render
-  };
-
-  useEffect(() => {
-    if (!subject_id) return;
-
-    const fetchData = async () => {
-      try {
-        // Fetch students
-        const studentsResponse = await axios.post('/api/subject/getStudents', { subject_id });
-
-        if (studentsResponse.status !== 200) throw new Error('Failed to fetch students');
-        const studentsData = studentsResponse.data.students;
-        totalClasses = studentsResponse.data.sessionCount;
-        setStudents(studentsData);
-
-      } catch (error) {
-        console.error('Error fetching data:', error);
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: { 
+      opacity: 1,
+      transition: { 
+        staggerChildren: 0.1,
+        delayChildren: 0.2
       }
     }
+  };
 
-    fetchData();
-  },[]);
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: { 
+      y: 0, 
+      opacity: 1,
+      transition: { type: "spring", stiffness: 100 }
+    }
+  };
 
   useEffect(() => {
     if (!subject_id) return;
 
-    const fetchData = async () => {
+    const fetchStudents = async () => {
       try {
-        // Fetch notes
-        const notesResponse = await axios.post('/api/subject/notes/getAllNotes', { subject_id });
-        
-        const notesData = notesResponse.data;
-        setNotes(notesData);
-
+        const res = await axios.post('/api/subject/getStudents', { subject_id });
+        if (res.status !== 200) throw new Error('Failed to fetch students');
+        totalClasses = res.data.sessionCount;
+        setStudents(res.data.students);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Error fetching students:', error);
       }
     };
 
-    fetchData();
-}, [refresh2]);
+    fetchStudents();
+  }, []);
+
+  useEffect(() => {
+    if (!subject_id) return;
+
+    const fetchNotes = async () => {
+      try {
+        const res = await axios.post('/api/subject/notes/getAllNotes', { subject_id });
+        setNotes(res.data);
+      } catch (error) {
+        console.error('Error fetching notes:', error);
+      }
+    };
+
+    fetchNotes();
+  }, [refresh2]);
 
   useEffect(() => {
     const fetchSessions = async () => {
       try {
-        const response = await axios.post('/api/subject/session/getAllSessions', { subject_id });
-        
-        const data = response.data;
-        
-        // Sort sessions by date (ascending)
-        const sortedSessions = data.sort((a, b) => new Date(a.date) - new Date(b.date));
-        //console.log('Fetched sessions:', sortedSessions);
-        setSessions(sortedSessions);
+        const res = await axios.post('/api/subject/session/getAllSessions', { subject_id });
+        const sorted = res.data.sort((a, b) => new Date(a.date) - new Date(b.date));
+        setSessions(sorted);
       } catch (error) {
         console.error('Error fetching sessions:', error);
       }
@@ -95,89 +102,221 @@ const Subject = () => {
   }, [refresh]);
 
   return (
-    <div className="flex flex-col min-h-screen px-12 md:px-24" style={{ backgroundColor: themeColors.secondary }}>
-      <main className="flex-1 p-4 flex flex-col md:flex-row gap-4">
-        {/* Classes & Notes Selection (Left Side) */}
-        <div className="w-full md:w-1/2 space-y-4">
-          {/* Classes Selection */}
-          <div className="bg-white rounded-lg shadow p-4">
-            <h2 className="text-lg font-semibold mb-4" style={{ color: themeColors.primary }}>Classes</h2>
-            <div className="grid grid-cols-2 gap-4">
-                {sessions.map((session) => (
-                  <button className='hover:cursor-pointer' key={session.id} onClick={() => router.push(`/dashboard/subject/session/${session.id}`)}>
-                    <div key={session.id} className="border rounded-lg p-4 flex flex-col hover:bg-gray-50">
-                    <h3 className="font-medium" style={{ color: themeColors.primary }}>{session.title || 'Untitled Session'}</h3>
-                    <p className="text-sm text-gray-500">{new Date(session.date).toLocaleDateString()}</p>
-                    </div>
-                  </button>
-                ))}
+    <motion.div
+      className="flex flex-col min-h-screen px-4 md:px-8 py-8 text-white"
+      style={{ backgroundColor: themeColors.secondary, color: themeColors.text }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.6 }}
+    >
+      <motion.main 
+        className="flex-1 flex flex-col gap-8"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        {/* Classes Section */}
+        <motion.section
+          className="w-full rounded-2xl shadow-xl p-6"
+          style={{
+            backgroundColor: themeColors.card,
+            backdropFilter: 'blur(10px)',
+            WebkitBackdropFilter: 'blur(10px)',
+            borderLeft: `4px solid ${themeColors.primary}`
+          }}
+          variants={itemVariants}
+        >
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-semibold bg-gradient-to-r from-purple-400 to-indigo-500 bg-clip-text text-transparent">Classes</h2>
+          </div>
+
+          {sessions.length === 0 ? (
+            <motion.div 
+              className="flex flex-col items-center justify-center p-8 rounded-xl border border-dashed"
+              style={{ borderColor: themeColors.accent, backgroundColor: 'rgba(58, 49, 83, 0.2)' }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+            >
+              <p className="text-center mb-3" style={{ color: themeColors.faded }}>No classes have been scheduled yet</p>
               <AddSessionCard subject_id={subject_id} onSessionCreated={handleSessionCreated} />
-            </div>
-          </div>
-
-          {/* Notes Selection */}
-          <div className="bg-white rounded-lg shadow p-4">
-            <h2 className="text-lg font-semibold mb-4" style={{ color: themeColors.primary }}>Notes</h2>
-            <div className="grid grid-cols-2 gap-4">
-              {notes.map((note) => (
-                // onclick will render the NotesViewPopUp component
-                <button className='hover:cursor-pointer' key={note.id} onClick={() => setSelectedNote(note)}>
-                  <div key={note.id} className="border rounded-lg p-4 flex flex-col items-center cursor-pointer hover:bg-gray-50">
-                    <h3 className="font-medium" style={{ color: themeColors.primary }}>{note.title || 'Untitled Note'}</h3>
-                    <p className="text-sm text-gray-500">{note.description || 'No description available'}</p>
+            </motion.div>
+          ) : (
+            <div className="flex flex-nowrap overflow-x-auto gap-4 pb-4 scrollbar-thin scrollbar-thumb-[#3a3153] scrollbar-track-transparent">
+              {sessions.map((session, index) => (
+                <motion.div
+                  key={session.id}
+                  className="flex-shrink-0 w-64 rounded-xl border cursor-pointer overflow-hidden flex flex-col"
+                  style={{ backgroundColor: 'rgba(58, 49, 83, 0.5)', borderColor: 'rgba(95, 67, 178, 0.3)' }}
+                  initial={{ opacity: 0, x: 30 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.08 }}
+                  whileHover={{ 
+                    scale: 1.03, 
+                    boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.2)",
+                    borderColor: themeColors.primary
+                  }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => router.push(`/dashboard/subject/session/${session.id}`)}
+                >
+                  <div className="p-4 flex-1">
+                    <h3 className="font-semibold text-lg mb-1 line-clamp-1" style={{ color: themeColors.text }}>
+                      {session.title || 'Untitled Session'}
+                    </h3>
+                    <p className="text-sm" style={{ color: themeColors.faded }}>
+                      {new Date(session.date).toLocaleDateString('en-US', { 
+                        weekday: 'short', 
+                        month: 'short', 
+                        day: 'numeric' 
+                      })}
+                    </p>
                   </div>
-                </button>
+                  <div className="h-1.5" style={{ backgroundColor: themeColors.primary, opacity: 0.7 }}></div>
+                </motion.div>
               ))}
-              <AddNoteCard subject_id={subject_id} onNoteCreated={handleNoteCreation} />
+              <motion.div 
+                className="flex-shrink-0 w-64 flex items-center justify-center"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: sessions.length * 0.08 + 0.1 }}
+              >
+                <AddSessionCard subject_id={subject_id} onSessionCreated={handleSessionCreated} />
+              </motion.div>
             </div>
-          </div>
-        </div>
+          )}
+        </motion.section>
+        
+        {/* Divider */}
+        <motion.div
 
-        {/* Student List (Right Side) */}
-        <div className="w-full md:w-1/2">
-          <div className="bg-white rounded-lg shadow p-4">
-            <h2 className="text-lg font-semibold mb-4" style={{ color: themeColors.primary }}>
-              Student List
-            </h2>
-            <div className="space-y-2">
-              {visibleStudents.map((student) => (
-                <div key={student.id} className="flex items-center justify-between border-b pb-2 last:border-0">
-                  <div className="flex items-center">
-                    <div className="h-10 w-10 rounded-full overflow-hidden mr-3">
-                      <img src={student.image} alt={student.name} className="h-full w-full object-cover" />
-                    </div>
-                    <div>
-                      <h3 className="font-medium" style={{ color: themeColors.primary }}>{student.name}</h3>
-                      <p className="text-sm text-gray-500">{student.email}</p>
-                    </div>
-                  </div>
+          className="h-1 bg-gradient-to-r from-purple-400 to-indigo-500 rounded-full"
+          style={{ backgroundColor: themeColors.primary, opacity: 0.5 }}
+          variants={itemVariants}
+        ></motion.div>
+
+        {/* Students Section */}
+        <motion.section
+          className="w-full rounded-2xl shadow-xl p-6"
+          style={{
+            backgroundColor: themeColors.card,
+            backdropFilter: 'blur(10px)',
+            WebkitBackdropFilter: 'blur(10px)',
+            borderLeft: `4px solid ${themeColors.primary}`
+          }}
+          variants={itemVariants}
+        >
+          <h2 className="text-2xl font-semibold mb-6 bg-gradient-to-r from-purple-400 to-indigo-500 bg-clip-text text-transparent">Student List</h2>
+          <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-[#3a3153] scrollbar-track-transparent rounded-xl">
+            {visibleStudents.map((student, index) => (
+              <motion.div 
+                key={student.id} 
+                className="flex items-center justify-between p-3 rounded-xl"
+                style={{ backgroundColor: 'rgba(58, 49, 83, 0.3)' }}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.05 }}
+                whileHover={{ backgroundColor: 'rgba(58, 49, 83, 0.5)' }}
+              >
+                <div className="flex items-center">
+                  <img
+                    src={student.image || '/api/placeholder/40/40'}
+                    alt={student.name}
+                    className="h-10 w-10 rounded-full object-cover mr-3 border-2"
+                    style={{ borderColor: themeColors.primary }}
+                  />
                   <div>
-                    <span className="font-semibold" style={{ color: themeColors.primary }}>
-                      Attendance: {student.attendance.length}/{totalClasses}
-                    </span>
+                    <h3 className="font-medium" style={{ color: themeColors.text }}>{student.name}</h3>
+                    <p className="text-sm" style={{ color: themeColors.faded }}>{student.email}</p>
                   </div>
                 </div>
-              ))}
-            </div>
-            {students.length > 10 && (
-              <div className="mt-4 text-center">
-                <button
-                  className="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300 hover:cursor-pointer"
-                  onClick={() => setShowAll(!showAll)}
-                >
-                  {showAll ? "Show Less" : "Show More"}
-                </button>
-              </div>
-            )}
+                <div className="flex items-center">
+                  <motion.div 
+                    className="px-3 py-1 rounded-full"
+                    style={{ backgroundColor: themeColors.primary }}
+                    whileHover={{ scale: 1.05 }}
+                  >
+                    <span className="font-semibold text-sm" style={{ color: themeColors.text }}>
+                      {student.attendance.length}/{totalClasses}
+                    </span>
+                  </motion.div>
+                </div>
+              </motion.div>
+            ))}
           </div>
-        </div>
 
-        {/* Render the popup only when selectedNote is set */}
+          {students.length > 10 && (
+            <motion.div 
+              className="mt-6 text-center"
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+            >
+              <button
+                className="px-6 py-2 bg-[#3a3153] text-white rounded-lg hover:bg-[#5f43b2] transition-colors duration-300"
+                onClick={() => setShowAll(!showAll)}
+              >
+                {showAll ? 'Show Less' : 'Show More'}
+              </button>
+            </motion.div>
+          )}
+        </motion.section>
+
+        <motion.div
+          className="h-1 bg-gradient-to-r from-purple-400 to-indigo-500 rounded-full"
+          style={{ backgroundColor: themeColors.primary, opacity: 0.5 }}
+          variants={itemVariants}
+        ></motion.div>
+
+        {/* Notes Section */}
+        <motion.section
+          className="w-full rounded-2xl shadow-xl p-6"
+          style={{
+            backgroundColor: themeColors.card,
+            backdropFilter: 'blur(10px)',
+            WebkitBackdropFilter: 'blur(10px)',
+            borderLeft: `4px solid ${themeColors.primary}`
+          }}
+          variants={itemVariants}
+        >
+          <h2 className="text-2xl font-semibold mb-6 bg-gradient-to-r from-purple-400 to-indigo-500 bg-clip-text text-transparent">Notes</h2>
+          <div className="flex flex-col gap-4">
+            {notes.map((note, index) => (
+              <motion.div
+                key={note.id}
+                className="p-4 rounded-xl border cursor-pointer"
+                style={{ backgroundColor: themeColors.accent, backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)' }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.05 }}
+                whileHover={{ scale: 1.02, boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)" }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => setSelectedNote(note)}
+              >
+                <h3 className="font-semibold" style={{ color: themeColors.text }}>{note.title || 'Untitled Note'}</h3>
+                <p className="text-sm mt-2" style={{ color: themeColors.faded }}>{note.description || 'No description available'}</p>
+              </motion.div>
+            ))}
+            <motion.div 
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <AddNoteCard subject_id={subject_id} onNoteCreated={handleNoteCreation} />
+            </motion.div>
+          </div>
+        </motion.section>
+      </motion.main>
+
+      <AnimatePresence>
         {selectedNote && (
-          <NotesViewPopUp note={selectedNote} onClose={() => setSelectedNote(null)} />
+          <motion.div 
+            initial={{ opacity: 0 }} 
+            animate={{ opacity: 1 }} 
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <NotesViewPopUp note={selectedNote} onClose={() => setSelectedNote(null)} />
+          </motion.div>
         )}
-      </main>
-    </div>
+      </AnimatePresence>
+    </motion.div>
   );
 };
 

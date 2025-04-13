@@ -3,83 +3,111 @@ import React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { signOut } from 'next-auth/react';
+import { LogOut } from "lucide-react";
 
 const Navbar = () => {
   const router = useRouter();
-  
+
+  // Define theme colors
+  const themeColors = {
+    primary: '#5f43b2', // Studio purple
+    secondary: '#3a3153', // Mystique
+    accent: '#b1aebb', // Gray Powder
+    text: '#fefdfd', // Soft Peach
+    hover: '#6f53c2', // Lighter purple for hover
+  };
+
   return (
-    <nav className="flex items-center justify-between px-6 py-4" style={{ backgroundColor: '#2F3C7E' }}>
+    <nav
+      className="w-full px-6 py-4 shadow-md flex items-center justify-between"
+      style={{
+        background: `linear-gradient(to right, ${themeColors.secondary}, ${themeColors.primary})`,
+      }}
+    >
       {/* Logo and Brand Name */}
-      <Link href="/" className="flex items-center">
-        <div className="w-10 h-10 mr-3 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'rgba(251, 234, 235, 0.2)' }}>
-          <svg 
-            xmlns="http://www.w3.org/2000/svg" 
-            viewBox="0 0 24 24" 
-            fill="none" 
-            stroke="currentColor" 
+      <Link href="/" className="flex items-center space-x-3">
+        <div
+          className="w-10 h-10 rounded-xl flex items-center justify-center"
+          style={{ backgroundColor: themeColors.accent }}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="white"
             className="w-6 h-6"
-            style={{ color: '#FBEAEB' }}
           >
             <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"></polygon>
           </svg>
         </div>
-        <span className="text-xl font-bold" style={{ color: '#FBEAEB' }}>YourBrand</span>
+        <span
+          className="text-2xl font-semibold tracking-tight"
+          style={{ color: themeColors.text }}
+        >
+          YourBrand
+        </span>
       </Link>
-      
+
       {/* Navigation Links */}
-      <div className="flex items-center space-x-8">
-        <Link 
-          href="/dashboard" 
-          className="font-medium transition-colors duration-200 hover:opacity-80"
-          style={{ color: '#FBEAEB' }}
+      <div className="flex gap-6 text-sm font-medium">
+        <Link
+          href="/dashboard"
+          className="transition"
+          style={{ color: themeColors.text }}
+          onMouseEnter={(e) => (e.target.style.color = themeColors.accent)}
+          onMouseLeave={(e) => (e.target.style.color = themeColors.text)}
         >
           Dashboard
         </Link>
-        <Link 
+        <Link
           href="/about"
-          className="font-medium transition-colors duration-200 hover:opacity-80"
-          style={{ color: '#FBEAEB' }}
+          className="transition"
+          style={{ color: themeColors.text }}
+          onMouseEnter={(e) => (e.target.style.color = themeColors.accent)}
+          onMouseLeave={(e) => (e.target.style.color = themeColors.text)}
         >
           About Us
         </Link>
-        <Link 
+        <Link
           href="/contact"
-          className="font-medium transition-colors duration-200 hover:opacity-80"
-          style={{ color: '#FBEAEB' }}
+          className="transition"
+          style={{ color: themeColors.text }}
+          onMouseEnter={(e) => (e.target.style.color = themeColors.accent)}
+          onMouseLeave={(e) => (e.target.style.color = themeColors.text)}
         >
-          Contact Us
+          Contact
         </Link>
       </div>
-      
-      {/* User Profile and Logout */}
+
+      {/* Profile and Logout */}
       <div className="flex items-center space-x-4">
-        <div className="w-10 h-10 rounded-full overflow-hidden border-2" style={{ borderColor: '#FBEAEB' }}>
-          <img 
-            src="/api/placeholder/40/40" 
-            alt="User avatar" 
-            className="w-full h-full object-cover"
+        <div
+          className="w-10 h-10 rounded-full border-2 overflow-hidden"
+          style={{ borderColor: themeColors.text }}
+        >
+          <img
+            src="/api/placeholder/40/40"
+            alt="User"
+            className="object-cover w-full h-full"
           />
         </div>
-        <button 
-          className="flex items-center px-5 py-2 rounded-full font-medium transition-all duration-200 hover:opacity-90"
-          style={{ backgroundColor: '#FBEAEB', color: '#2F3C7E' }}
-          onClick={() => {
-            // Handle logout logic here
-            signOut({ callbackUrl: '/auth/signin' }); // redirect after logout
+        <button
+          onClick={() => signOut({ callbackUrl: '/auth/signin' })}
+          className="flex items-center gap-2 font-semibold px-4 py-2 rounded-full transition"
+          style={{
+            backgroundColor: themeColors.text,
+            color: themeColors.secondary,
+          }}
+          onMouseEnter={(e) => {
+            e.target.style.backgroundColor = themeColors.accent;
+            e.target.style.color = themeColors.text;
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.backgroundColor = themeColors.text;
+            e.target.style.color = themeColors.secondary;
           }}
         >
-          <svg 
-            xmlns="http://www.w3.org/2000/svg" 
-            viewBox="0 0 24 24" 
-            fill="none" 
-            stroke="currentColor" 
-            className="w-4 h-4 mr-2"
-            style={{ color: '#2F3C7E' }}
-          >
-            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-            <polyline points="16 17 21 12 16 7"></polyline>
-            <line x1="21" y1="12" x2="9" y2="12"></line>
-          </svg>
+          <LogOut className="w-4 h-4" />
           Logout
         </button>
       </div>
