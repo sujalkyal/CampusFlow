@@ -3,6 +3,8 @@
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import { motion } from 'framer-motion';
+import { CheckCircle, XCircle, User } from 'lucide-react';
 
 export default function StudentSubmission() {
   const params = useParams();
@@ -16,21 +18,18 @@ export default function StudentSubmission() {
 
     const fetchData = async () => {
       try {
-        // Get submitted students
         const resSubmitted = await axios.post('/api/session/assignment/getSubmissionDetails', {
           assignment_id: assignmentId,
         });
 
         const submitted = resSubmitted.data || [];
 
-        // Get all students of the batch
         const resAll = await axios.post('/api/session/assignment/getAllStudents', {
           assignment_id: assignmentId,
         });
 
         const all = resAll.data || [];
 
-        // Filter not submitted students
         const submittedIds = new Set(submitted.map((s) => s.id));
         const notSubmitted = all.filter((student) => !submittedIds.has(student.id));
 
@@ -45,51 +44,131 @@ export default function StudentSubmission() {
   }, [assignmentId]);
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
-      <h2 className="text-xl font-semibold text-[#2F3C7E] mb-4">Student Submissions</h2>
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, ease: 'easeOut' }}
+      className="bg-[#2a2a3f] rounded-2xl shadow-xl p-6 h-full"
+    >
+      <h2 className="text-2xl font-semibold text-[#fefdfd] mb-6 flex items-center">
+        <span className="mr-2 inline-block w-1 h-6 bg-[#5f43b2] rounded-full"></span>
+        Student Submissions
+      </h2>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="flex flex-col gap-6">
+        {/* Stats Overview */}
+        <div className="grid grid-cols-2 gap-4 mb-2">
+          <motion.div 
+            className="bg-[#3a3153] p-4 rounded-xl flex items-center"
+            whileHover={{ scale: 1.02 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 10 }}
+          >
+            <div className="bg-green-500/20 p-2 rounded-full mr-3">
+              <CheckCircle className="text-green-400 w-5 h-5" />
+            </div>
+            <div>
+              <p className="text-xs text-[#b1aebb]">Submitted</p>
+              <p className="text-xl font-bold text-[#fefdfd]">{submittedStudents.length}</p>
+            </div>
+          </motion.div>
+
+          <motion.div 
+            className="bg-[#3a3153] p-4 rounded-xl flex items-center"
+            whileHover={{ scale: 1.02 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 10 }}
+          >
+            <div className="bg-red-500/20 p-2 rounded-full mr-3">
+              <XCircle className="text-red-400 w-5 h-5" />
+            </div>
+            <div>
+              <p className="text-xs text-[#b1aebb]">Not Submitted</p>
+              <p className="text-xl font-bold text-[#fefdfd]">{notSubmittedStudents.length}</p>
+            </div>
+          </motion.div>
+        </div>
+
         {/* Submitted Tab */}
-        <div>
-          <h3 className="font-medium text-green-500 mb-3">Submitted</h3>
-          <div className="space-y-3">
-            {submittedStudents.map((student) => (
-              <div key={student.id} className="flex items-center">
-                <div className="w-8 h-8 rounded-full bg-gray-200 overflow-hidden mr-2">
-                  <img
-                    src={student.avatar || '/api/placeholder/32/32'}
-                    alt={student.name}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div>
-                  <p className="text-sm font-medium">{student.name}</p>
-                  <p className="text-xs text-gray-500">{student.email}</p>
-                </div>
-              </div>
-            ))}
+        <div className="mb-4">
+          <div className="flex items-center mb-3">
+            <div className="w-2 h-2 rounded-full bg-green-400 mr-2"></div>
+            <h3 className="font-medium text-[#fefdfd] text-sm uppercase tracking-wider">Submitted</h3>
+          </div>
+          <div className="space-y-3 max-h-[180px] overflow-y-auto pr-2 custom-scrollbar">
+            {submittedStudents.length > 0 ? (
+              submittedStudents.map((student) => (
+                <motion.div 
+                  key={student.id} 
+                  className="flex items-center bg-[#3a3153]/50 rounded-lg p-2 hover:bg-[#3a3153]"
+                  whileHover={{ x: 5 }}
+                  transition={{ type: 'spring', stiffness: 500 }}
+                >
+                  <div className="w-9 h-9 rounded-full bg-[#5f43b2]/30 overflow-hidden mr-3 flex items-center justify-center">
+                    {student.avatar ? (
+                      <img
+                        src={student.avatar}
+                        alt={student.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <User className="w-5 h-5 text-[#fefdfd]" />
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-[#fefdfd]">{student.name}</p>
+                    <p className="text-xs text-[#b1aebb]">{student.email}</p>
+                  </div>
+                  <div className="bg-green-500/20 p-1.5 rounded-full">
+                    <CheckCircle className="text-green-400 w-3.5 h-3.5" />
+                  </div>
+                </motion.div>
+              ))
+            ) : (
+              <p className="text-[#b1aebb] text-sm italic text-center py-4">No submissions yet</p>
+            )}
           </div>
         </div>
 
         {/* Not Submitted Tab */}
         <div>
-          <h3 className="font-medium text-red-500 mb-3">Not Submitted</h3>
-          <div className="space-y-3">
-            {notSubmittedStudents.map((student) => (
-              <div key={student.id} className="flex items-center">
-                <div className="w-8 h-8 rounded-full bg-gray-200 overflow-hidden mr-2">
-                  <img
-                    src={student.avatar || '/api/placeholder/32/32'}
-                    alt={student.name}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <p className="text-sm font-medium">{student.name}</p>
-              </div>
-            ))}
+          <div className="flex items-center mb-3">
+            <div className="w-2 h-2 rounded-full bg-red-400 mr-2"></div>
+            <h3 className="font-medium text-[#fefdfd] text-sm uppercase tracking-wider">Not Submitted</h3>
+          </div>
+          <div className="space-y-3 max-h-[180px] overflow-y-auto pr-2 custom-scrollbar">
+            {notSubmittedStudents.length > 0 ? (
+              notSubmittedStudents.map((student) => (
+                <motion.div 
+                  key={student.id} 
+                  className="flex items-center bg-[#3a3153]/50 rounded-lg p-2 hover:bg-[#3a3153]"
+                  whileHover={{ x: 5 }}
+                  transition={{ type: 'spring', stiffness: 500 }}
+                >
+                  <div className="w-9 h-9 rounded-full bg-[#5f43b2]/30 overflow-hidden mr-3 flex items-center justify-center">
+                    {student.avatar ? (
+                      <img
+                        src={student.avatar}
+                        alt={student.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <User className="w-5 h-5 text-[#fefdfd]" />
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-[#fefdfd]">{student.name}</p>
+                    <p className="text-xs text-[#b1aebb]">{student.email || 'No email provided'}</p>
+                  </div>
+                  <div className="bg-red-500/20 p-1.5 rounded-full">
+                    <XCircle className="text-red-400 w-3.5 h-3.5" />
+                  </div>
+                </motion.div>
+              ))
+            ) : (
+              <p className="text-[#b1aebb] text-sm italic text-center py-4">No students found</p>
+            )}
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
