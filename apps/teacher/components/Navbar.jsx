@@ -34,7 +34,7 @@ const Navbar = () => {
         </div>
         <button
           onClick={() => signOut({ callbackUrl: '/auth/signin' })}
-          className="flex items-center gap-2 bg-[#fefdfd] text-[#3a3153] font-semibold px-4 py-2 rounded-full hover:bg-[#b1aebb] hover:text-white transition"
+          className="flex items-center gap-2 bg-[#fefdfd] text-[#3a3153] font-semibold px-4 py-2 rounded-full hover:bg-[#b1aebb] hover:text-white transition hover:cursor-pointer"
         >
           <LogOut className="w-4 h-4" />
           Logout

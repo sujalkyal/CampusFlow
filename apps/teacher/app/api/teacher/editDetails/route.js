@@ -13,7 +13,7 @@ export async function POST(request) {
     try {
         const teacherId = session.user.id;
         const { name, email, newPassword, oldPassword, dept_name, batches, subjects } = await request.json();
-        console.log('Request body:', { name, email, newPassword, oldPassword, dept_name, batches, subjects });
+        //console.log('Request body:', { name, email, newPassword, oldPassword, dept_name, batches, subjects });
         
 
         const teacher = await prisma.teacher.findFirst({ where: { id: teacherId } });

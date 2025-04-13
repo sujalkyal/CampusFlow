@@ -40,7 +40,7 @@ export async function POST(req) {
       },
     });
 
-    console.log("The submission is : ", submission);
+    //console.log("The submission is : ", submission);
 
     if (!submission) {
       return NextResponse.json({ error: "Submission not found" }, { status: 404 });

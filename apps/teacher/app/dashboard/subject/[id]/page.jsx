@@ -243,7 +243,7 @@ const Subject = () => {
             ))}
           </div>
 
-          {students.length > 10 && (
+          {/* {students.length > 10 && (
             <motion.div 
               className="mt-6 text-center"
               whileHover={{ scale: 1.03 }}
@@ -256,7 +256,7 @@ const Subject = () => {
                 {showAll ? 'Show Less' : 'Show More'}
               </button>
             </motion.div>
-          )}
+          )} */}
         </motion.section>
 
         <motion.div

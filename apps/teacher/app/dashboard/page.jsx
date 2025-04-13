@@ -146,8 +146,8 @@ const SubjectDashboard = () => {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.98 }}
                   >
-                    <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-[#5f43b2] to-[#3a3153] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    <span className="relative">Edit Profile</span>
+                    <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-[#5f43b2] to-[#3a3153] opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:cursor-pointer" />
+                    <span className="relative hover:cursor-pointer">Edit Profile</span>
                   </motion.button>
                 </motion.div>
                 
@@ -245,7 +245,7 @@ const SubjectDashboard = () => {
                           <p className="text-[#b1aebb] text-sm">ID: {session.subject_id}</p>
                         </div>
                         <motion.button 
-                          className="mt-4 w-full py-2 bg-[#010101]/80 text-[#fefdfd] rounded-md text-sm"
+                          className="mt-4 w-full py-2 bg-[#010101]/80 text-[#fefdfd] rounded-md text-sm hover:cursor-pointer"
                           whileHover={{ backgroundColor: "rgba(95, 67, 178, 0.3)" }}
                           whileTap={{ scale: 0.98 }}
                         >
@@ -288,7 +288,7 @@ const SubjectDashboard = () => {
               {subjects.map((subject, index) => (
                 <motion.div
                   key={index}
-                  className="group relative overflow-hidden"
+                  className="group relative overflow-hidden hover:cursor-pointer"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}

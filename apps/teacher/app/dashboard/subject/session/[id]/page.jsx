@@ -36,7 +36,7 @@ const AttendanceTable = () => {
     const fetchBatch = async () => {
         try {
             const response = await axios.post('/api/batch/getBatchFromSubject', { subject_id: subjectId });
-            console.log("Batch API Response:", response.data);
+            //console.log("Batch API Response:", response.data);
             setSubjectName(response.data.subject.name);
             setBatchName(response.data.batchName);
             setStudents(response.data.students || []);
@@ -118,7 +118,7 @@ const AttendanceTable = () => {
             const createResponse = await axios.post('/api/session/assignment/createAssignment', {
               session_id: sessionId,
             });
-            console.log("Assignment created:", createResponse.data);
+            //console.log("Assignment created:", createResponse.data);
             router.push(`/dashboard/subject/session/assignment/${createResponse.data.id}`);
           }
         } catch (error) {
@@ -175,7 +175,7 @@ const AttendanceTable = () => {
                 <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className="bg-[#5f43b2] text-[#fefcfd] px-4 py-2 rounded-lg flex items-center space-x-2 shadow-md shadow-[#5f43b2]/20"
+                    className="bg-[#5f43b2] text-[#fefcfd] px-4 py-2 rounded-lg flex items-center space-x-2 shadow-md shadow-[#5f43b2]/20 hover:cursor-pointer"
                     onClick={() => createAssignment()}
                 >
                     <span>Assignment</span>
@@ -228,7 +228,7 @@ const AttendanceTable = () => {
                                     <motion.button
                                         whileHover={{ scale: 1.1 }}
                                         whileTap={{ scale: 0.9 }}
-                                        className={`p-2 rounded-full ${attendance[student.id] === "present" ? "bg-green-500 text-[#fefcfd]" : "bg-green-500/20 text-green-400"} shadow-md`}
+                                        className={`p-2 rounded-full ${attendance[student.id] === "present" ? "bg-green-500 text-[#fefcfd]" : "bg-green-500/20 text-green-400"} shadow-md hover:cursor-pointer`}
                                         onClick={() => markAttendance(student.id, "present")}
                                     >
                                         <CheckCircle size={20} />
@@ -236,7 +236,7 @@ const AttendanceTable = () => {
                                     <motion.button
                                         whileHover={{ scale: 1.1 }}
                                         whileTap={{ scale: 0.9 }}
-                                        className={`p-2 rounded-full ${attendance[student.id] === "absent" ? "bg-red-500 text-[#fefcfd]" : "bg-red-500/20 text-red-400"} shadow-md`}
+                                        className={`p-2 rounded-full ${attendance[student.id] === "absent" ? "bg-red-500 text-[#fefcfd]" : "bg-red-500/20 text-red-400"} shadow-md hover:cursor-pointer`}
                                         onClick={() => markAttendance(student.id, "absent")}
                                     >
                                         <XCircle size={20} />
@@ -244,7 +244,7 @@ const AttendanceTable = () => {
                                     <motion.button
                                         whileHover={{ scale: 1.1 }}
                                         whileTap={{ scale: 0.9 }}
-                                        className={`p-2 rounded-full ${attendance[student.id] === "late" ? "bg-yellow-500 text-[#fefcfd]" : "bg-yellow-500/20 text-yellow-400"} shadow-md`}
+                                        className={`p-2 rounded-full ${attendance[student.id] === "late" ? "bg-yellow-500 text-[#fefcfd]" : "bg-yellow-500/20 text-yellow-400"} shadow-md hover:cursor-pointer`}
                                         onClick={() => markAttendance(student.id, "late")}
                                     >
                                         <Clock size={20} />

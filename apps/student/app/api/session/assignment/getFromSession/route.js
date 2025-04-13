@@ -6,7 +6,7 @@ export async function POST(req) {
     try {
         const body = await req.json();
         const { session_id } = body;
-        console.log("Session ID is:", session_id);
+        //console.log("Session ID is:", session_id);
 
         const session = await prisma.session.findUnique({
             where: { id: session_id }

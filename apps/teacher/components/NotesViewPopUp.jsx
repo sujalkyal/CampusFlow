@@ -39,7 +39,7 @@ const NotesViewPopUp = ({ note, onClose }) => {
 
   const handleSubmit = async () => {
     try {
-      console.log('noteDetails: ', noteDetails); // Log the note details before sending
+      //console.log('noteDetails: ', noteDetails); // Log the note details before sending
 
       const response = await axios.post('/api/subject/notes/updateFiles', {
         note_id: noteDetails.id,
@@ -80,7 +80,7 @@ const NotesViewPopUp = ({ note, onClose }) => {
       }));
 
       toast.success('Files uploaded successfully!');
-      console.log('files: ', noteDetails.files); // Log the updated note details
+      //console.log('files: ', noteDetails.files); // Log the updated note details
     } catch (error) {
       toast.error('Error uploading file');
       console.error('Error uploading file:', error);
@@ -108,7 +108,7 @@ const NotesViewPopUp = ({ note, onClose }) => {
             {/* Close button in top right */}
             <button 
               onClick={handleClose} 
-              className="absolute top-4 right-4 text-[#b1aebb] hover:text-[#fefcfd] transition-colors"
+              className="absolute top-4 right-4 text-[#b1aebb] hover:text-[#fefcfd] transition-colors hover:cursor-pointer"
             >
               <X size={20} />
             </button>
@@ -156,7 +156,7 @@ const NotesViewPopUp = ({ note, onClose }) => {
                           whileHover={{ scale: 1.1 }}
                           whileTap={{ scale: 0.9 }}
                           onClick={() => handleDelete(fileUrl)} 
-                          className="absolute top-1 right-1 p-1 rounded-full bg-[#010101]/80 text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                          className="absolute top-1 right-1 p-1 rounded-full bg-[#010101]/80 text-red-500 opacity-0 group-hover:opacity-100 transition-opacity hover:cursor-pointer"
                         >
                           <Trash2 size={16} />
                         </motion.button>
@@ -190,7 +190,7 @@ const NotesViewPopUp = ({ note, onClose }) => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={handleClose} 
-                className="bg-[#3a3153] text-[#b1aebb] px-4 py-2 rounded hover:text-[#fefcfd] transition-colors"
+                className="bg-[#3a3153] text-[#b1aebb] px-4 py-2 rounded hover:text-[#fefcfd] transition-colors hover:cursor-pointer"
               >
                 Cancel
               </motion.button>
@@ -199,7 +199,7 @@ const NotesViewPopUp = ({ note, onClose }) => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={handleSubmit} 
-                className="bg-[#5f43b2] text-[#fefcfd] px-4 py-2 rounded"
+                className="bg-[#5f43b2] text-[#fefcfd] px-4 py-2 rounded hover:cursor-pointer"
               >
                 Save Changes
               </motion.button>
