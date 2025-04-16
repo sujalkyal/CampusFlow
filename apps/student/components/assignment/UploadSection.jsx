@@ -1,11 +1,11 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
-import { Trash2, PlusCircle } from "lucide-react";
+import { Trash2, PlusCircle, Upload, CheckCircle, AlertCircle } from "lucide-react";
 import axios from "axios";
 import { useEdgeStore } from "../../app/lib/edgestore";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useParams } from "next/navigation";
 
 export default function FilesUploadSection() {
@@ -33,8 +33,6 @@ export default function FilesUploadSection() {
         } else {
           setSubmissionId(null);
         }
-
-        //console.log("Submission id is : ", res.data);
       } catch (err) {
         console.error("Error fetching submission:", err);
       } finally {
@@ -130,64 +128,133 @@ export default function FilesUploadSection() {
     }
   };
 
-  if (loading) return <p className="text-center">Loading...</p>;
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.05 }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 10 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { type: "spring", stiffness: 300 }
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-40">
+        <motion.div
+          className="w-8 h-8 border-2 border-t-[#5f43b2] rounded-full"
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+        />
+      </div>
+    );
+  }
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 30 }}
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6 }}
-      className="bg-white/30 backdrop-blur-md rounded-2xl shadow-lg border border-gray-200 p-6 mt-8"
+      transition={{ duration: 0.5 }}
+      className="text-[#fefdfd]"
     >
-      <h2 className="text-xl font-semibold text-[#2F3C7E] mb-4">Upload Files</h2>
-
       {submissionId ? (
         <>
-          <div className="grid grid-cols-3 gap-4">
-            {files.length > 0 ? (
-              files.map((file, index) => (
-                <div
-                  key={index}
-                  className="relative bg-white/70 border border-gray-300 p-2 rounded-xl flex flex-col items-center shadow group"
-                >
-                  {/\.(jpeg|jpg|png|gif)$/i.test(file) ? (
-                    <img
-                      src={file}
-                      alt="Uploaded"
-                      className="w-full h-24 object-cover rounded-md cursor-pointer mb-1"
-                      onClick={() => window.open(file, "_blank")}
-                    />
-                  ) : file.endsWith(".pdf") ? (
-                    <iframe
-                      src={file}
-                      className="w-full h-24 border rounded-md cursor-pointer mb-1"
-                      title="PDF File"
-                      onClick={() => window.open(file, "_blank")}
-                    />
-                  ) : (
-                    <a
-                      href={file}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 text-sm hover:underline truncate"
+          <div className="mb-4 flex items-center justify-between">
+            <div className="flex items-center">
+              <div className="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
+              <span className="text-sm text-[#fefdfd]">Submission Active</span>
+            </div>
+            <motion.div
+              className="bg-[#5f43b2]/20 px-3 py-1 rounded-full"
+              whileHover={{ scale: 1.05 }}
+            >
+              <span className="text-xs font-medium text-[#fefdfd]">
+                {files.length} {files.length === 1 ? "file" : "files"}
+              </span>
+            </motion.div>
+          </div>
+
+          <AnimatePresence>
+            {files.length > 0 && (
+              <motion.div
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+                className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6"
+              >
+                {files.map((file, index) => {
+                  const fileName = decodeURIComponent(file.split("/").pop());
+                  
+                  return (
+                    <motion.div
+                      key={index}
+                      variants={itemVariants}
+                      className="relative bg-[#3a3153]/30 backdrop-blur-sm border border-[#5f43b2]/20 rounded-lg overflow-hidden group"
+                      whileHover={{ y: -4, backgroundColor: "rgba(58, 49, 83, 0.5)" }}
                     >
-                      {decodeURIComponent(file.split("/").pop())}
-                    </a>
-                  )}
+                      <div className="h-24 overflow-hidden">
+                        {/\.(jpeg|jpg|png|gif|webp)$/i.test(file) ? (
+                          <motion.img
+                            src={file}
+                            alt="Uploaded"
+                            className="w-full h-full object-cover cursor-pointer"
+                            onClick={() => window.open(file, "_blank")}
+                            whileHover={{ scale: 1.05 }}
+                            transition={{ duration: 0.2 }}
+                          />
+                        ) : file.endsWith(".pdf") ? (
+                          <div className="relative w-full h-full bg-[#010101]/60">
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <Upload className="w-8 h-8 text-[#5f43b2]/80" />
+                            </div>
+                            <iframe
+                              src={file}
+                              className="w-full h-full opacity-50 hover:opacity-70 transition-opacity cursor-pointer"
+                              title="PDF File"
+                              onClick={() => window.open(file, "_blank")}
+                            />
+                          </div>
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center bg-[#3a3153]/50">
+                            <Upload className="w-10 h-10 text-[#b1aebb]/50" />
+                          </div>
+                        )}
+                      </div>
 
-                  <button
-                    onClick={() => handleDelete(file)}
-                    className="absolute top-1 right-1 text-red-500 hover:text-red-700"
-                  >
-                    <Trash2 size={18} />
-                  </button>
-                </div>
-              ))
-            ) : (
-              <p className="col-span-3 text-center text-gray-500">No files uploaded yet.</p>
+                      <div className="p-2 flex items-center justify-between">
+                        <p className="text-xs text-[#fefdfd] truncate max-w-[120px]">
+                          {fileName}
+                        </p>
+                        <motion.button
+                          onClick={() => handleDelete(file)}
+                          className="text-red-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                          whileHover={{ scale: 1.2 }}
+                          whileTap={{ scale: 0.9 }}
+                        >
+                          <Trash2 size={16} />
+                        </motion.button>
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </motion.div>
             )}
+          </AnimatePresence>
 
-            <label className="w-full h-24 border-2 border-dashed border-gray-400 flex items-center justify-center rounded-lg cursor-pointer hover:bg-gray-100 transition">
+          <div className="space-y-4">
+            <motion.label 
+              className="w-full h-28 border border-dashed border-[#5f43b2]/50 flex flex-col items-center justify-center rounded-lg cursor-pointer hover:bg-[#5f43b2]/10 transition-colors"
+              whileHover={{ scale: 1.01, borderColor: "#5f43b2" }}
+              whileTap={{ scale: 0.99 }}
+            >
               <input
                 ref={fileInputRef}
                 type="file"
@@ -196,34 +263,60 @@ export default function FilesUploadSection() {
                 multiple
                 onChange={(e) => handleFileUpload(e.target.files)}
               />
-              <div className="flex flex-col items-center text-gray-500">
-                <PlusCircle size={24} />
-                <span className="text-sm">Add File</span>
-              </div>
-            </label>
-          </div>
+              <PlusCircle size={24} className="text-[#5f43b2] mb-2" />
+              <span className="text-sm text-[#b1aebb]">Add more files</span>
+              <span className="text-xs text-[#b1aebb]/70 mt-1">Click or drag files here</span>
+            </motion.label>
 
-          <div className="flex justify-end space-x-3 mt-6">
-            <button
-              onClick={handleSubmit}
-              className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-5 py-2 rounded-xl hover:opacity-90 transition"
+            <motion.div
+              variants={itemVariants}
+              className="flex justify-end mt-6"
             >
-              Submit Files
-            </button>
+              <motion.button
+                onClick={handleSubmit}
+                className="bg-[#5f43b2] hover:bg-[#5f43b2]/80 px-5 py-2.5 rounded-full flex items-center"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                transition={{ type: "spring", stiffness: 400, damping: 10 }}
+              >
+                <CheckCircle size={16} className="mr-2" />
+                <span>Submit Files</span>
+              </motion.button>
+            </motion.div>
           </div>
         </>
       ) : (
-        <div className="text-center">
-          <button
+        <motion.div
+          className="flex flex-col items-center justify-center py-12 bg-[#3a3153]/20 rounded-lg"
+          variants={itemVariants}
+        >
+          <AlertCircle className="w-12 h-12 text-[#5f43b2]/70 mb-3" />
+          <p className="text-[#b1aebb] mb-4">No submission created yet</p>
+          <motion.button
             onClick={createSubmission}
-            className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-xl transition"
+            className="bg-[#5f43b2] hover:bg-[#5f43b2]/80 px-5 py-2.5 rounded-full flex items-center"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            transition={{ type: "spring", stiffness: 400, damping: 10 }}
           >
-            Create Submission
-          </button>
-        </div>
+            <Upload size={16} className="mr-2" />
+            <span>Create Submission</span>
+          </motion.button>
+        </motion.div>
       )}
 
-      <ToastContainer position="top-right" autoClose={3000} />
+      <ToastContainer 
+        position="top-right" 
+        autoClose={3000} 
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+      />
     </motion.div>
   );
 }

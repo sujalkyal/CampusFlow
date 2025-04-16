@@ -61,54 +61,67 @@ export default function AssignmentDetails() {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="bg-white/30 backdrop-blur-md rounded-2xl shadow-lg border border-gray-200 overflow-hidden relative"
+      className="text-[#fefdfd]"
     >
-      {/* Header Image */}
-      <div className="h-24 w-full bg-gradient-to-r from-[#2F3C7E] to-[#6C63FF] flex items-center justify-between px-6 py-4">
-        <h2 className="text-white text-xl font-semibold flex items-center gap-2">
-          <ClipboardList className="w-5 h-5" />
-          Assignment Overview
-        </h2>
-        <span className="bg-white text-[#2F3C7E] text-xs font-semibold px-3 py-1 rounded-full shadow-sm flex items-center gap-1">
-          <CalendarDays className="w-4 h-4" />
-          {formData.dueDate}
-        </span>
+      {/* Assignment Header with Due Date */}
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-lg font-medium text-[#fefdfd]">
+          {formData.title || "Assignment"}
+        </h3>
+        <motion.div 
+          className="bg-[#5f43b2]/20 px-3 py-1.5 rounded-full flex items-center"
+          whileHover={{ scale: 1.05 }}
+        >
+          <CalendarDays className="w-3.5 h-3.5 mr-2 text-[#5f43b2]" />
+          <span className="text-xs font-medium text-[#fefdfd]">
+            Due: {formData.dueDate || "Not specified"}
+          </span>
+        </motion.div>
       </div>
 
-      <div className="p-6 space-y-6">
-        {/* Details */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-800">
-          <div className="flex gap-3 items-center">
-            <FileText className="w-5 h-5 text-[#2F3C7E]" />
-            <div>
-              <p className="text-sm font-medium text-gray-600">Title</p>
-              <p className="text-base font-semibold">{formData.title}</p>
-            </div>
+      {/* Details Cards */}
+      <div className="space-y-4">
+        {/* Points */}
+        <motion.div 
+          className="bg-[#3a3153]/50 rounded-lg p-4 backdrop-blur-sm"
+          whileHover={{ y: -2, transition: { duration: 0.2 } }}
+        >
+          <div className="flex items-center mb-2">
+            <Star className="w-4 h-4 text-[#5f43b2] mr-2" />
+            <h4 className="text-sm font-medium text-[#b1aebb]">Total Points</h4>
           </div>
-
-          <div className="flex gap-3 items-center">
-            <Star className="w-5 h-5 text-yellow-500" />
-            <div>
-              <p className="text-sm font-medium text-gray-600">Total Points</p>
-              <p className="text-base font-semibold">100</p>
-            </div>
-          </div>
-        </div>
-
+          <p className="text-[#fefdfd] font-medium">{formData.totalPoints || "100"}</p>
+        </motion.div>
+        
         {/* Instructions */}
-        <div>
-          <div className="flex items-center gap-2 mb-2 text-[#2F3C7E]">
-            <StickyNote className="w-5 h-5" />
-            <h3 className="font-semibold">Instructions</h3>
+        <motion.div 
+          className="bg-[#3a3153]/50 rounded-lg p-4 backdrop-blur-sm"
+          whileHover={{ y: -2, transition: { duration: 0.2 } }}
+        >
+          <div className="flex items-center mb-2">
+            <StickyNote className="w-4 h-4 text-[#5f43b2] mr-2" />
+            <h4 className="text-sm font-medium text-[#b1aebb]">Instructions</h4>
           </div>
-          <p className="text-sm text-gray-700 whitespace-pre-line bg-gray-100 p-4 rounded-xl shadow-inner">
+          <div className="bg-[#010101]/30 p-4 rounded-lg mt-2 text-sm text-[#fefdfd] whitespace-pre-line max-h-60 overflow-y-auto custom-scrollbar">
             {formData.instructions || "No specific instructions provided."}
-          </p>
-        </div>
+          </div>
+        </motion.div>
       </div>
+
+      {/* Assignment Status */}
+      <motion.div 
+        className="mt-6 bg-[#5f43b2]/10 border border-[#5f43b2]/20 rounded-lg p-3 flex items-center justify-between"
+        whileHover={{ scale: 1.01 }}
+      >
+        <div className="flex items-center">
+          <div className="w-2 h-2 bg-[#5f43b2] rounded-full mr-2"></div>
+          <span className="text-sm text-[#fefdfd]">Active Assignment</span>
+        </div>
+        <span className="text-xs text-[#b1aebb]">Submit before due date</span>
+      </motion.div>
     </motion.div>
   );
 }
