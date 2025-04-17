@@ -1,57 +1,83 @@
 "use client";
 import React, { useEffect, useState } from 'react';
+import { useSession } from 'next-auth/react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import EditStudentPopup from '../../components/Popup';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const SubjectDashboard = () => {
+  const { data: session, status } = useSession();
   const [student, setStudent] = useState(null);
   const [subjects, setSubjects] = useState([]);
   const [dept, setDept] = useState(null);
   const [batch, setBatch] = useState(null);
   const [upcomingSessions, setUpcomingSessions] = useState([]);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
   const fetchStudentDetails = async () => {
     try {
-      const studentRes = await axios.get('/api/student/getStudentDetails', {
-        withCredentials: true
-      });
-
+      const studentRes = await axios.get('/api/student/getStudentDetails', { withCredentials: true });
       setStudent(studentRes.data.user);
       setDept(studentRes.data.dept_name);
-
-      const subjectRes = await axios.get('/api/subject/getSubjects', {
-        withCredentials: true
-      });
+  
+      const subjectRes = await axios.get('/api/subject/getSubjects', { withCredentials: true });
       setSubjects(subjectRes.data.subjects);
       setBatch(subjectRes.data.batch_name);
     } catch (error) {
       console.error('Error fetching data:', error.response?.data?.message || error.message);
     }
   };
-
+  
   const fetchUpcomingSessions = async () => {
     try {
-      const sessionRes = await axios.get('/api/student/getUpcomingSessions', {
-        withCredentials: true
-      });
+      const sessionRes = await axios.get('/api/student/getUpcomingSessions', { withCredentials: true });
       setUpcomingSessions(sessionRes.data);
     } catch (error) {
       console.error('Error fetching upcoming sessions:', error.response?.data?.message || error.message);
     }
   };
+  
 
   useEffect(() => {
-    fetchUpcomingSessions();
-    fetchStudentDetails();
-  }, []);
+    if (status === "loading") {
+      setIsLoading(true);  // Show loading while checking session
+    } else if (status === "authenticated") {
+      // Fetch all data when authenticated
+      const fetchData = async () => {
+        await Promise.all([fetchStudentDetails(), fetchUpcomingSessions()]);
+        setIsLoading(false); // Only set loading to false when both data fetching completes
+      };
+      fetchData();
+    } else if (status === "unauthenticated") {
+      router.push('/auth/signin');
+    }
+  }, [status]);
+  
 
-  const handleEditClick = () => {
-    setIsPopupOpen(true);
-  };
+  if (status === "loading") {
+    return (
+      <div className="flex justify-center items-center h-screen bg-[#010101]">
+        <div className="text-lg font-semibold text-[#fefdfd]">Checking session...</div>
+      </div>
+    );
+  }
+  
+  if (status === "unauthenticated") {
+    return null;
+  }
+  
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-screen bg-[#010101]">
+        <div className="text-lg font-semibold text-[#fefdfd]">Loading data...</div>
+      </div>
+    );
+  }
 
   // Animation variants
   const containerVariants = {
@@ -72,6 +98,10 @@ const SubjectDashboard = () => {
       opacity: 1,
       transition: { type: "spring", stiffness: 100 }
     }
+  };
+
+  const handleEditClick = () => {
+    setIsPopupOpen(true);
   };
 
   return (
@@ -204,76 +234,77 @@ const SubjectDashboard = () => {
           )}
           
           {/* Upcoming Sessions Section */}
-          <motion.div 
-            variants={itemVariants}
-            className="bg-[#010101]/70 backdrop-blur-xl rounded-lg p-6 mx-4"
-          >
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-[#fefdfd] flex items-center">
-                <span className="block w-1 h-6 bg-[#5f43b2] mr-2"></span>
-                Upcoming Sessions
-              </h2>
-              <motion.div 
-                className="h-1 flex-grow ml-4 bg-gradient-to-r from-[#5f43b2]/50 to-transparent rounded-full"
-                initial={{ scaleX: 0, originX: 0 }}
-                animate={{ scaleX: 1 }}
-                transition={{ delay: 0.5, duration: 1 }}
-              />
-            </div>
-            
-            {upcomingSessions.length > 0 ? (
-              <div className="overflow-x-auto pb-4">
-                <div className="flex gap-4 min-w-max">
-                  {upcomingSessions.map((session, index) => (
-                    <motion.div
-                      key={index}
-                      className="w-64 bg-[#fefdfd]/5 backdrop-blur-md rounded-lg overflow-hidden flex flex-col"
-                      variants={itemVariants}
-                      whileHover={{ 
-                        y: -5, 
-                        boxShadow: "0 20px 30px -10px rgba(0, 0, 0, 0.3)"
-                      }}
-                      onClick={() => router.push(`/dashboard/subject/session/${session.id}`)}
-                    >
-                      <div className="bg-gradient-to-r from-[#5f43b2] to-[#3a3153] py-3 px-4">
-                        <div className="flex justify-between items-center">
-                          <p className="text-sm text-[#fefdfd]/80">
-                            {new Date(session.date).toLocaleDateString('en-US', { weekday: 'short' })}
-                          </p>
-                          <h3 className="text-xl font-bold">
-                            {new Date(session.date).getDate()}
-                          </h3>
-                          <p className="text-sm text-[#fefdfd]/80">
-                            {new Date(session.date).toLocaleDateString('en-US', { month: 'short' })}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="p-4 flex-grow flex flex-col justify-between">
-                        <div>
-                          <h3 className="font-semibold text-lg text-[#fefdfd] mb-2">{session.subject_name}</h3>
-                          <p className="text-[#b1aebb] text-sm">ID: {session.id}</p>
-                        </div>
-                        <motion.button 
-                          className="mt-4 w-full py-2 bg-[#010101]/80 text-[#fefdfd] rounded-md text-sm hover:cursor-pointer"
-                          whileHover={{ backgroundColor: "rgba(95, 67, 178, 0.3)" }}
-                          whileTap={{ scale: 0.98 }}
-                        >
-                          View Details
-                        </motion.button>
-                      </div>
-                    </motion.div>
-                  ))}
+<motion.div 
+  variants={itemVariants}
+  className="bg-[#010101]/70 backdrop-blur-xl rounded-lg p-6 mx-4"
+>
+  <div className="flex items-center justify-between mb-6">
+    <h2 className="text-xl font-bold text-[#fefdfd] flex items-center">
+      <span className="block w-1 h-6 bg-[#5f43b2] mr-2"></span>
+      Upcoming Sessions
+    </h2>
+    <motion.div 
+      className="h-1 flex-grow ml-4 bg-gradient-to-r from-[#5f43b2]/50 to-transparent rounded-full"
+      initial={{ scaleX: 0, originX: 0 }}
+      animate={{ scaleX: 1 }}
+      transition={{ delay: 0.5, duration: 1 }}
+    />
+  </div>
+  
+  {upcomingSessions.length > 0 ? (
+    <div className="overflow-x-auto pb-4 custom-scrollbar">
+      <div className="flex gap-4 min-w-max">
+        {upcomingSessions
+          .sort((a, b) => new Date(a.date) - new Date(b.date))
+          .map((session, index) => (
+            <motion.div
+              key={index}
+              className="w-64 bg-[#fefdfd]/5 backdrop-blur-md rounded-lg overflow-hidden flex flex-col"
+              variants={itemVariants}
+            >
+              <div className="bg-gradient-to-r from-[#5f43b2] to-[#3a3153] py-3 px-4">
+                <div className="flex justify-between items-center">
+                  <p className="text-sm text-[#fefdfd]/80">
+                    {new Date(session.date).toLocaleDateString('en-US', { weekday: 'short' })}
+                  </p>
+                  <h3 className="text-xl font-bold">
+                    {new Date(session.date).getDate()}
+                  </h3>
+                  <p className="text-sm text-[#fefdfd]/80">
+                    {new Date(session.date).toLocaleDateString('en-US', { month: 'short' })}
+                  </p>
                 </div>
               </div>
-            ) : (
-              <motion.div 
-                className="bg-[#010101]/60 backdrop-blur-md rounded-lg p-6 text-center"
-                variants={itemVariants}
-              >
-                <p className="text-[#b1aebb]">No upcoming sessions scheduled.</p>
-              </motion.div>
-            )}
-          </motion.div>
+              <div className="p-4 flex-grow flex flex-col justify-between">
+                <div>
+                  <h3 className="font-semibold text-lg text-[#fefdfd] mb-2">{session.subject_name}</h3>
+                  <p className="text-[#b1aebb] text-sm">Title: {session.title || "Untitled Session"}</p>
+                </div>
+                <motion.button 
+                  className="mt-4 w-full py-2 bg-[#010101]/80 text-[#fefdfd] rounded-md text-sm hover:cursor-pointer"
+                  whileHover={{ backgroundColor: "rgba(95, 67, 178, 0.3)" }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => router.push(`/dashboard/subject/session/${session.id}`)}
+                >
+                  View Details
+                </motion.button>
+              </div>
+            </motion.div>
+        ))}
+      </div>
+    </div>
+  ) : (
+    <motion.div 
+      className="bg-[#010101]/60 backdrop-blur-md rounded-lg p-6 text-center"
+      variants={itemVariants}
+    >
+      <p className="text-[#b1aebb]">No upcoming sessions scheduled.</p>
+    </motion.div>
+  )}
+</motion.div>
+
+
+
           
           {/* Subject Cards with Glassmorphism */}
           <motion.div 
@@ -348,6 +379,18 @@ const SubjectDashboard = () => {
           </motion.div>
         )}
       </AnimatePresence>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+      />
     </motion.div>
   );
 };

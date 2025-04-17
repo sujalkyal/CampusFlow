@@ -117,7 +117,7 @@ export default function AboutPage() {
   return (
     <motion.div 
       className="min-h-screen text-[#fefdfd]"
-      style={{ 
+      style={{
         background: THEME.background,
         backgroundImage: "radial-gradient(circle at 50% 0%, #3a3153 0%, #010101 70%)",
         backgroundAttachment: "fixed"
@@ -165,7 +165,7 @@ export default function AboutPage() {
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: "spring", stiffness: 100, delay: 0.3 }}
-              className="h-20 w-20 rounded-3xl bg-gradient-to-br from-[#5f43b2] to-[#3a3153] flex items-center justify-center mb-8"
+              className="h-30 w-30 rounded-3xl bg-transparent flex items-center justify-center mb-8"
             >
               <motion.div 
                 animate={{ 
@@ -173,7 +173,11 @@ export default function AboutPage() {
                 }}
                 transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
               >
-                <Book className="h-10 w-10 text-white" />
+                <img 
+                src="/logo_transparent.png" 
+                alt="Logo" 
+                className="w-30 h-30"
+              />
               </motion.div>
             </motion.div>
             
