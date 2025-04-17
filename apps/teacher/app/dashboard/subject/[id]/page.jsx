@@ -141,7 +141,7 @@ const Subject = () => {
               <AddSessionCard subject_id={subject_id} onSessionCreated={handleSessionCreated} />
             </motion.div>
           ) : (
-            <div className="flex flex-nowrap overflow-x-auto gap-4 pb-4 scrollbar-thin scrollbar-thumb-[#3a3153] scrollbar-track-transparent">
+            <div className="flex flex-nowrap overflow-x-auto gap-4 pb-4 custom-scrollbar">
               {sessions.map((session, index) => (
                 <motion.div
                   key={session.id}
@@ -151,7 +151,7 @@ const Subject = () => {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.08 }}
                   whileHover={{ 
-                    scale: 1.03, 
+                    scale: 1.00, 
                     boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.2)",
                     borderColor: themeColors.primary
                   }}
@@ -187,7 +187,6 @@ const Subject = () => {
         
         {/* Divider */}
         <motion.div
-
           className="h-1 bg-gradient-to-r from-purple-400 to-indigo-500 rounded-full"
           style={{ backgroundColor: themeColors.primary, opacity: 0.5 }}
           variants={itemVariants}
@@ -205,7 +204,7 @@ const Subject = () => {
           variants={itemVariants}
         >
           <h2 className="text-2xl font-semibold mb-6 bg-gradient-to-r from-purple-400 to-indigo-500 bg-clip-text text-transparent">Student List</h2>
-          <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-[#3a3153] scrollbar-track-transparent rounded-xl">
+          <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar rounded-xl">
             {visibleStudents.map((student, index) => (
               <motion.div 
                 key={student.id} 
@@ -242,21 +241,6 @@ const Subject = () => {
               </motion.div>
             ))}
           </div>
-
-          {/* {students.length > 10 && (
-            <motion.div 
-              className="mt-6 text-center"
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-            >
-              <button
-                className="px-6 py-2 bg-[#3a3153] text-white rounded-lg hover:bg-[#5f43b2] transition-colors duration-300"
-                onClick={() => setShowAll(!showAll)}
-              >
-                {showAll ? 'Show Less' : 'Show More'}
-              </button>
-            </motion.div>
-          )} */}
         </motion.section>
 
         <motion.div
@@ -286,7 +270,7 @@ const Subject = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.05 }}
-                whileHover={{ scale: 1.02, boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)" }}
+                whileHover={{ scale: 0.98 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => setSelectedNote(note)}
               >
@@ -295,7 +279,7 @@ const Subject = () => {
               </motion.div>
             ))}
             <motion.div 
-              whileHover={{ scale: 1.02 }}
+              whileHover={{ scale: 0.98 }}
               whileTap={{ scale: 0.98 }}
             >
               <AddNoteCard subject_id={subject_id} onNoteCreated={handleNoteCreation} />
