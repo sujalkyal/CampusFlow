@@ -151,7 +151,7 @@ export default function AssignmentDetails() {
               transition={{ type: "spring", damping: 20 }}
             >
               <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-medium text-[#fefcfd]">Edit Assignment Details</h3>
+                <h3 className="text-lg font-medium text-[#fefcfd] ">Edit Assignment Details</h3>
                 <motion.button 
                   onClick={() => setIsModalOpen(false)} 
                   className="text-[#b1aebb] hover:text-[#fefcfd] p-1 rounded hover:cursor-pointer"
