@@ -51,11 +51,6 @@ export async function GET(req) {
       },
     });
 
-    //console.log("Batch Details: ", batchDetails);
-    //console.log("Subjects: ", subjects);
-    //console.log("User : ", user);
-
-
     const batchMap = new Map(batchDetails.map(batch => [batch.id, batch.name]));
     subjects.forEach(subject => {
       subject.batch_name = batchMap.get(subject.batch_id) || "Unknown Batch";

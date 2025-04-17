@@ -55,11 +55,13 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
           {/* College Management Info */}
           <motion.div variants={itemAnimation} className="flex flex-col">
-            <Link href="/" className="flex items-center mb-6 group">
-              <div className="w-10 h-10 mr-3 rounded-lg bg-gradient-to-br from-[#5f43b2] to-[#3a3153] flex items-center justify-center shadow-lg shadow-[#5f43b2]/10 group-hover:shadow-[#5f43b2]/20 transition-all duration-300">
-                <BookOpen className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-xl font-bold text-[#fefdfd]">College Management</span>
+            <Link href="/dashboard" className="flex items-center mb-6 group">
+              <img 
+                src="/logo_transparent.png" 
+                alt="Logo" 
+                className="w-20 h-20"
+              />
+              <span className="text-xl font-bold text-[#fefdfd]">CampusFlow</span>
             </Link>
             
             <p className="mb-6 text-sm text-[#b1aebb] leading-relaxed">
@@ -69,7 +71,7 @@ const Footer = () => {
             <div className="flex space-x-4">
               {/* Social Icons */}
               <motion.a
-                href="https://github.com"
+                href="https://github.com/sujalkyal"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-9 h-9 rounded-full flex items-center justify-center bg-[#3a3153]/30 hover:bg-[#5f43b2]/10 transition-colors"
@@ -91,7 +93,7 @@ const Footer = () => {
               </motion.a>
               
               <motion.a
-                href="https://linkedin.com"
+                href="http://linkedin.com/in/sujal-kyal-712b9024b"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-9 h-9 rounded-full flex items-center justify-center bg-[#3a3153]/30 hover:bg-[#5f43b2]/10 transition-colors"
@@ -114,8 +116,8 @@ const Footer = () => {
               {[
                 { text: 'Dashboard', href: '/dashboard' },
                 { text: 'About Us', href: '/about' },
-                { text: 'Courses', href: '/courses' },
-                { text: 'Assignments', href: '/assignments' },
+                { text: 'Courses', href: '#' },
+                { text: 'Assignments', href: '#' },
                 { text: 'Contact', href: '/contact' }
               ].map((link, i) => (
                 <Link 
@@ -139,11 +141,11 @@ const Footer = () => {
             
             <div className="flex flex-col space-y-4">
               {[
-                { text: 'Help Center', href: '/help' },
-                { text: 'FAQ', href: '/faq' },
-                { text: 'Privacy Policy', href: '/privacy' },
-                { text: 'Terms of Service', href: '/terms' },
-                { text: 'Support', href: '/support' }
+                { text: 'Help Center', href: '#' },
+                { text: 'FAQ', href: '#' },
+                { text: 'Privacy Policy', href: '#' },
+                { text: 'Terms of Service', href: '#' },
+                { text: 'Support', href: '/contact' }
               ].map((link, i) => (
                 <Link 
                   key={i} 
@@ -180,7 +182,7 @@ const Footer = () => {
               
               <motion.button
                 type="submit"
-                className="w-full px-4 py-2.5 rounded-lg text-sm font-medium bg-[#5f43b2] hover:bg-[#5f43b2]/90 text-[#fefdfd] flex items-center justify-center"
+                className="w-full px-4 py-2.5 rounded-lg text-sm font-medium bg-[#5f43b2] hover:bg-[#5f43b2]/90 text-[#fefdfd] flex items-center justify-center hover:cursor-pointer"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >

@@ -55,12 +55,14 @@ export default function Signin() {
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.2, duration: 0.5 }}
           >
-            <Link href="/" className="flex items-center group">
-              <div className="w-12 h-12 mr-3 rounded-xl bg-gradient-to-br from-[#5f43b2] to-[#3a3153] flex items-center justify-center shadow-lg shadow-[#5f43b2]/20">
-                <BookOpen className="w-6 h-6 text-white" />
-              </div>
-              <span className="text-2xl font-bold text-[#fefdfd]">College Management</span>
-            </Link>
+            <div className="flex items-center group gap-3">
+            <img 
+                src="/logo_transparent.png" 
+                alt="Logo" 
+                className="w-20 h-20"
+              />
+              <span className="text-3xl font-bold text-[#fefdfd]">CampusFlow</span>
+            </div>
           </motion.div>
 
           <motion.div
@@ -110,7 +112,7 @@ export default function Signin() {
                   className="absolute right-4 top-1/2 transform -translate-y-1/2 text-[#b1aebb]"
                   onClick={() => setShowPassword(!showPassword)}
                 >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  {showPassword ? <EyeOff className="w-5 h-5 hover:cursor-pointer" /> : <Eye className="w-5 h-5 hover:cursor-pointer" />}
                 </button>
               </div>
 
@@ -118,18 +120,18 @@ export default function Signin() {
                 <label className="flex items-center">
                   <input 
                     type="checkbox" 
-                    className="form-checkbox h-4 w-4 text-[#5f43b2] rounded border-[#5f43b2]/30 focus:ring-0 focus:ring-offset-0 bg-[#3a3153]/30"
+                    className="form-checkbox h-4 w-4 text-[#5f43b2] rounded border-[#5f43b2]/30 focus:ring-0 focus:ring-offset-0 bg-[#3a3153]/30 hover:cursor-pointer"
                   />
                   <span className="text-sm text-[#b1aebb] ml-2">Remember me</span>
                 </label>
-                <Link href="/auth/forgot-password" className="text-sm text-[#5f43b2] hover:text-[#5f43b2]/80 transition-colors">
+                <Link href="#" onClick={(e)=>{e.preventDefault()}} className="text-sm text-[#5f43b2] hover:text-[#5f43b2]/80 transition-colors">
                   Forgot password?
                 </Link>
               </div>
 
               <motion.button
                 type="submit"
-                className="w-full bg-[#5f43b2] text-white p-4 rounded-xl hover:bg-[#5f43b2]/90 flex items-center justify-center font-medium transition-all duration-300 mt-6"
+                className="w-full bg-[#5f43b2] text-white p-4 rounded-xl hover:bg-[#5f43b2]/90 flex items-center justify-center font-medium transition-all duration-300 mt-6 hover:cursor-pointer"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 disabled={isLoading}
@@ -152,7 +154,7 @@ export default function Signin() {
             </form>
 
             <div className="mt-8 text-center text-[#b1aebb] text-sm">
-              Don't have an account? <Link href="/auth/signup" className="text-[#5f43b2] hover:text-[#5f43b2]/80 transition-colors">Contact admin</Link>
+              Don't have an account? <Link href="/auth/signup" className="text-[#5f43b2] hover:text-[#5f43b2]/80 transition-colors">Sign Up</Link>
             </div>
           </motion.div>
         </div>

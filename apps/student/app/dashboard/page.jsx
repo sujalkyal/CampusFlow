@@ -136,7 +136,7 @@ const SubjectDashboard = () => {
                       transition={{ duration: 3, repeat: Infinity }}
                     />
                     <img 
-                      src={student.image || "/api/placeholder/96/96"} 
+                      src={student.image || "/user-placeholder.png"} 
                       alt="Student" 
                       className="relative w-24 h-24 rounded-full object-cover"
                     />
