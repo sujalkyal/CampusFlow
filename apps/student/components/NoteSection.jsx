@@ -55,7 +55,6 @@ const NotesSection = ({ subjectId, THEME }) => {
                 key={`note-${i}`}
                 onClick={() => setSelectedNote(note)}
                 className="rounded-lg overflow-hidden cursor-pointer bg-[#3a3153]/50 hover:bg-[#3a3153] transition-colors p-3 border-l-4 border-[#5f43b2]"
-                whileHover={{ x: 5 }}
                 transition={{ type: "spring", stiffness: 500 }}
               >
                 <div className="flex items-start justify-between">
@@ -113,7 +112,7 @@ const NotesSection = ({ subjectId, THEME }) => {
             >
               <button
                 onClick={closePopup}
-                className="absolute top-4 right-4 bg-[#3a3153]/60 hover:bg-[#5f43b2] p-1.5 rounded-full transition-colors"
+                className="absolute top-4 right-4 bg-[#3a3153]/60 hover:bg-[#5f43b2] p-1.5 rounded-full transition-colors hover:cursor-pointer"
               >
                 <X size={16} className="text-[#fefdfd]" />
               </button>

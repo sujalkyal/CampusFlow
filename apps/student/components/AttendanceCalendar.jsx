@@ -150,7 +150,7 @@ export default function AttendanceCalendar({ subject_id }) {
         <div className="w-full">
           <div className="flex justify-between items-center mb-5">
             <motion.button
-              className="p-2 rounded-full"
+              className="p-2 rounded-full hover:cursor-pointer"
               style={{ backgroundColor: "rgba(95, 67, 178, 0.1)" }}
               onClick={handlePrevMonth}
               whileHover={{ scale: 1.1, backgroundColor: "rgba(95, 67, 178, 0.2)" }}
@@ -169,7 +169,7 @@ export default function AttendanceCalendar({ subject_id }) {
             </motion.span>
             
             <motion.button
-              className="p-2 rounded-full"
+              className="p-2 rounded-full hover:cursor-pointer"
               style={{ backgroundColor: "rgba(95, 67, 178, 0.1)" }}
               onClick={handleNextMonth}
               whileHover={{ scale: 1.1, backgroundColor: "rgba(95, 67, 178, 0.2)" }}
