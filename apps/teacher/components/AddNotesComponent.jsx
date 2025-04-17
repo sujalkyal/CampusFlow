@@ -1,53 +1,78 @@
 import { useState } from "react";
-import { Plus, File, X } from "lucide-react";
+import { Plus, File, X, Upload, Check } from "lucide-react";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useEdgeStore } from "../app/lib/edgestore"; // Import EdgeStore hook
+import { useEdgeStore } from "../app/lib/edgestore";
 import { motion, AnimatePresence } from 'framer-motion';
 
 const AddNoteCard = ({ subject_id, onNoteCreated }) => {
-  // Theme colors from previous design
+  // Theme colors
   const themeColors = {
-    primary: '#5f43b2', // Studio purple
+    primary: '#5f43b2', // Main purple
     secondary: '#010101', // Black
-    accent: '#3a3153', // Mystique
+    accent: '#3a3153', // Darker purple
     card: 'rgba(42, 42, 64, 0.4)',
-    text: '#fefdfD', // Soft Peach
-    faded: '#b1aebb' // Gray Powder
+    text: '#fefdfD', // White text
+    faded: '#b1aebb' // Gray text
   };
 
+  // Component states
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [fileUrls, setFileUrls] = useState([]); // Store uploaded file URLs
+  const [fileUrls, setFileUrls] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  
+  // EdgeStore setup
   const { edgestore } = useEdgeStore();
   const publicFiles = edgestore.publicFiles;
 
+  /**
+   * Handles file uploads to EdgeStore
+   * @param {FileList} files - Files to upload
+   */
   const handleFileUpload = async (files) => {
+    if (!files || files.length === 0) return;
+    
     setUploading(true);
+    setUploadProgress(0);
+    
     try {
-      const uploadedUrls = await Promise.all(
-        [...files].map(async (file) => {
-          const res = await publicFiles.upload({
-            file,
-            options: {},
-          });
-          return res.url; // Get the uploaded file URL
-        })
-      );
-
-      setFileUrls((prev) => [...prev, ...uploadedUrls]); // Append URLs to state
+      const totalFiles = files.length;
+      const uploadedUrls = [];
+      
+      for (let i = 0; i < totalFiles; i++) {
+        const file = files[i];
+        const res = await publicFiles.upload({
+          file,
+          options: {},
+          onProgressChange: (progress) => {
+            // Calculate overall progress
+            const fileProgress = progress / 100;
+            const overallProgress = ((i + fileProgress) / totalFiles) * 100;
+            setUploadProgress(Math.round(overallProgress));
+          },
+        });
+        
+        uploadedUrls.push(res.url);
+      }
+      
+      setFileUrls((prev) => [...prev, ...uploadedUrls]);
       toast.success("Files uploaded successfully!");
     } catch (error) {
       console.error("File upload error:", error);
       toast.error("Failed to upload files.");
     } finally {
       setUploading(false);
+      setUploadProgress(100);
     }
   };
 
+  /**
+   * Creates a new note with the provided information
+   */
   const handleCreateNote = async () => {
     if (!title && fileUrls.length === 0) {
       toast.warn("Please enter a title or upload at least one file.");
@@ -59,7 +84,7 @@ const AddNoteCard = ({ subject_id, onNoteCreated }) => {
         title,
         description,
         subject_id,
-        files: fileUrls, // Pass file URLs array to backend
+        files: fileUrls,
       });
 
       toast.success("Note added successfully!");
@@ -71,6 +96,9 @@ const AddNoteCard = ({ subject_id, onNoteCreated }) => {
     }
   };
 
+  /**
+   * Closes the popup and resets form state
+   */
   const handleClosePopup = () => {
     setTitle("");
     setDescription("");
@@ -78,94 +106,146 @@ const AddNoteCard = ({ subject_id, onNoteCreated }) => {
     setShowPopup(false);
   };
 
+  /**
+   * Removes a file from the uploaded files list
+   * @param {number} indexToRemove - Index of file to remove
+   */
   const removeFile = (indexToRemove) => {
     setFileUrls(fileUrls.filter((_, index) => index !== indexToRemove));
   };
 
+  // Animation variants
+  const overlayVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1 }
+  };
+  
+  const modalVariants = {
+    hidden: { scale: 0.9, y: 20, opacity: 0 },
+    visible: { 
+      scale: 1, 
+      y: 0, 
+      opacity: 1,
+      transition: { type: "spring", damping: 25, stiffness: 300 }
+    },
+    exit: { 
+      scale: 0.95, 
+      y: 10, 
+      opacity: 0,
+      transition: { duration: 0.2 }
+    }
+  };
+
   return (
     <>
+      {/* Add Note Button */}
       <motion.div
-        className="w-full h-full"
-        whileHover={{ scale: 1.03 }}
-        whileTap={{ scale: 0.97 }}
+        className="w-full"
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.98 }}
       >
-        {!showPopup ? (
-          <motion.button
-            onClick={() => setShowPopup(true)}
-            className="w-full h-full p-4 rounded-xl border-2 border-dashed flex flex-col items-center justify-center transition-colors duration-300 hover:cursor-pointer"
-            style={{ 
-              borderColor: themeColors.accent,
-              backgroundColor: 'rgba(58, 49, 83, 0.2)',
-              minHeight: '100px'
-            }}
-            whileHover={{ backgroundColor: 'rgba(58, 49, 83, 0.4)' }}
+        <button
+          onClick={() => setShowPopup(true)}
+          className="w-full p-4 rounded-xl border-2 border-dashed flex flex-col items-center justify-center transition-colors duration-300"
+          style={{ 
+            borderColor: themeColors.accent,
+            backgroundColor: 'rgba(58, 49, 83, 0.2)',
+            minHeight: '100px'
+          }}
+        >
+          <motion.div
+            initial={{ scale: 1 }}
+            animate={{ scale: [1, 1.1, 1], rotate: [0, 0, 0] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
           >
             <Plus size={24} color={themeColors.primary} />
-            <span className="mt-2 text-sm font-medium" style={{ color: themeColors.faded }}>Add Note</span>
-          </motion.button>
-        ) : null}
+          </motion.div>
+          <span 
+            className="mt-2 text-sm font-medium" 
+            style={{ color: themeColors.faded }}
+          >
+            Add Note
+          </span>
+        </button>
       </motion.div>
 
+      {/* Modal Popup */}
       <AnimatePresence>
         {showPopup && (
           <motion.div 
-            className="fixed inset-0 flex items-center justify-center z-50 bg-black"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            className="fixed inset-0 flex items-center justify-center z-50"
+            variants={overlayVariants}
+            initial="hidden"
+            animate="visible"
+            exit="hidden"
             transition={{ duration: 0.2 }}
+            style={{ backgroundColor: 'rgba(0, 0, 0, 0.85)' }}
           >
             <motion.div 
               className="rounded-2xl shadow-2xl overflow-hidden"
-              style={{ backgroundColor: themeColors.secondary }}
-              initial={{ scale: 0.9, y: 20, opacity: 0 }}
-              animate={{ scale: 1, y: 0, opacity: 1 }}
-              exit={{ scale: 0.9, y: 20, opacity: 0 }}
-              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              variants={modalVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
             >
-              <div className="p-6 w-96">
-                <h2 
-                  className="text-xl font-semibold mb-6" 
-                  style={{ color: themeColors.text }}
-                >
-                  Add New Note
-                </h2>
+              <div className="w-[450px] p-6" style={{ backgroundColor: themeColors.secondary }}>
+                {/* Header */}
+                <div className="flex justify-between items-center mb-6">
+                  <h2 
+                    className="text-2xl font-semibold bg-gradient-to-r from-purple-400 to-indigo-500 bg-clip-text text-transparent"
+                  >
+                    Create New Note
+                  </h2>
+                  <motion.button
+                    onClick={handleClosePopup}
+                    whileHover={{ scale: 1.1, rotate: 90 }}
+                    whileTap={{ scale: 0.9 }}
+                    className="p-1 rounded-full"
+                    style={{ backgroundColor: 'rgba(58, 49, 83, 0.4)' }}
+                  >
+                    <X size={18} color={themeColors.faded} />
+                  </motion.button>
+                </div>
                 
-                <div className="space-y-4">
+                {/* Form */}
+                <div className="space-y-5">
+                  {/* Title Input */}
                   <div>
                     <label 
-                      className="block text-sm mb-2" 
+                      className="block text-sm font-medium mb-2" 
                       style={{ color: themeColors.faded }}
                     >
-                      Title (Optional)
+                      Title
                     </label>
                     <input
                       type="text"
-                      placeholder="Enter note title"
+                      placeholder="Enter a title for your note"
                       value={title}
                       onChange={(e) => setTitle(e.target.value)}
-                      className="w-full p-3 rounded-lg focus:outline-none focus:ring-2 transition-all duration-300"
+                      className="w-full p-3 rounded-lg focus:ring-2 focus:ring-opacity-50 focus:outline-none transition-all"
                       style={{ 
                         backgroundColor: 'rgba(58, 49, 83, 0.4)', 
                         color: themeColors.text,
                         border: `1px solid ${themeColors.accent}`,
+                        focusRing: themeColors.primary
                       }}
                     />
                   </div>
                   
+                  {/* Description Textarea */}
                   <div>
                     <label 
-                      className="block text-sm mb-2" 
+                      className="block text-sm font-medium mb-2" 
                       style={{ color: themeColors.faded }}
                     >
-                      Description (Optional)
+                      Description
                     </label>
                     <textarea
-                      placeholder="Enter description"
+                      placeholder="Add some details about this note"
                       value={description}
                       onChange={(e) => setDescription(e.target.value)}
-                      rows="3"
-                      className="w-full p-3 rounded-lg focus:outline-none focus:ring-2 transition-all duration-300"
+                      rows="4"
+                      className="w-full p-3 rounded-lg focus:ring-2 focus:ring-opacity-50 focus:outline-none transition-all custom-scrollbar"
                       style={{ 
                         backgroundColor: 'rgba(58, 49, 83, 0.4)', 
                         color: themeColors.text,
@@ -175,16 +255,21 @@ const AddNoteCard = ({ subject_id, onNoteCreated }) => {
                     />
                   </div>
                   
+                  {/* File Upload */}
                   <div>
                     <label 
-                      className="block text-sm mb-2" 
+                      className="block text-sm font-medium mb-2" 
                       style={{ color: themeColors.faded }}
                     >
-                      Upload Files
+                      Attachments
                     </label>
                     <motion.div
-                      className="relative overflow-hidden"
-                      whileHover={{ scale: 1.01 }}
+                      className="relative overflow-hidden rounded-lg"
+                      whileHover={{ 
+                        backgroundColor: 'rgba(58, 49, 83, 0.5)',
+                        borderColor: themeColors.primary
+                      }}
+                      initial={{ backgroundColor: 'rgba(58, 49, 83, 0.3)' }}
                     >
                       <input
                         type="file"
@@ -194,45 +279,40 @@ const AddNoteCard = ({ subject_id, onNoteCreated }) => {
                         disabled={uploading}
                       />
                       <div 
-                        className="w-full p-3 rounded-lg flex items-center justify-center cursor-pointer"
-                        style={{ 
-                          backgroundColor: 'rgba(58, 49, 83, 0.4)',
-                          border: `1px dashed ${themeColors.accent}`,
-                        }}
+                        className="w-full p-4 flex items-center justify-center cursor-pointer border border-dashed"
+                        style={{ borderColor: themeColors.accent }}
                       >
-                        <Plus size={18} color={themeColors.primary} className="mr-2" />
+                        <Upload size={18} className="mr-3" style={{ color: themeColors.primary }} />
                         <span style={{ color: themeColors.faded }}>
-                          {uploading ? "Uploading..." : "Select Files"}
+                          {uploading ? `Uploading (${uploadProgress}%)` : "Click to upload files"}
                         </span>
                       </div>
                     </motion.div>
+
+                    {/* Upload Progress */}
+                    {uploading && (
+                      <div className="mt-2">
+                        <div className="w-full h-1 bg-gray-700 rounded-full overflow-hidden">
+                          <motion.div 
+                            className="h-full"
+                            style={{ backgroundColor: themeColors.primary }}
+                            initial={{ width: "0%" }}
+                            animate={{ width: `${uploadProgress}%` }}
+                          />
+                        </div>
+                      </div>
+                    )}
                   </div>
                   
-                  {uploading && (
-                    <div className="flex items-center">
-                      <motion.div 
-                        className="w-full h-1 bg-gray-700 rounded-full overflow-hidden"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                      >
-                        <motion.div 
-                          className="h-full"
-                          style={{ backgroundColor: themeColors.primary }}
-                          initial={{ width: "0%" }}
-                          animate={{ 
-                            width: "100%",
-                            transition: { repeat: Infinity, duration: 1.5 }
-                          }}
-                        />
-                      </motion.div>
-                    </div>
-                  )}
-                  
+                  {/* Uploaded Files List */}
                   {fileUrls.length > 0 && (
                     <div 
-                      className="mt-2 max-h-32 overflow-y-auto rounded-lg p-2"
+                      className="mt-2 max-h-36 overflow-y-auto rounded-lg p-3 custom-scrollbar"
                       style={{ backgroundColor: 'rgba(58, 49, 83, 0.2)' }}
                     >
+                      <p className="text-xs mb-2" style={{ color: themeColors.faded }}>
+                        {fileUrls.length} file{fileUrls.length !== 1 ? 's' : ''} attached
+                      </p>
                       <ul className="space-y-2">
                         {fileUrls.map((url, index) => (
                           <motion.li 
@@ -244,8 +324,8 @@ const AddNoteCard = ({ subject_id, onNoteCreated }) => {
                             transition={{ delay: index * 0.05 }}
                           >
                             <div className="flex items-center truncate mr-2">
-                              <File size={14} className="mr-2" style={{ color: themeColors.primary }} />
-                              <span className="text-xs truncate" style={{ color: themeColors.faded }}>
+                              <File size={14} className="mr-2 flex-shrink-0" style={{ color: themeColors.primary }} />
+                              <span className="text-xs truncate" style={{ color: themeColors.text }}>
                                 {url.split('/').pop()}
                               </span>
                             </div>
@@ -253,8 +333,9 @@ const AddNoteCard = ({ subject_id, onNoteCreated }) => {
                               onClick={() => removeFile(index)}
                               whileHover={{ scale: 1.2 }}
                               whileTap={{ scale: 0.9 }}
+                              className="bg-opacity-20 bg-red-500 hover:bg-opacity-40 p-1 rounded-full"
                             >
-                              <X size={14} style={{ color: themeColors.faded }} />
+                              <X size={14} style={{ color: '#ff6b6b' }} />
                             </motion.button>
                           </motion.li>
                         ))}
@@ -263,26 +344,42 @@ const AddNoteCard = ({ subject_id, onNoteCreated }) => {
                   )}
                 </div>
                 
+                {/* Action Buttons */}
                 <div className="flex justify-end space-x-3 mt-8">
                   <motion.button 
                     onClick={handleClosePopup}
-                    className="px-5 py-2 rounded-lg hover:cursor-pointer"
-                    style={{ backgroundColor: 'rgba(58, 49, 83, 0.6)', color: themeColors.text }}
-                    whileHover={{ scale: 1.05, backgroundColor: 'rgba(58, 49, 83, 0.8)' }}
-                    whileTap={{ scale: 0.95 }}
+                    className="px-5 py-2 rounded-lg font-medium"
+                    style={{ 
+                      backgroundColor: 'rgba(58, 49, 83, 0.4)', 
+                      color: themeColors.faded,
+                      border: `1px solid ${themeColors.accent}` 
+                    }}
+                    whileHover={{ 
+                      backgroundColor: 'rgba(58, 49, 83, 0.6)',
+                      scale: 1.03
+                    }}
+                    whileTap={{ scale: 0.97 }}
+                    disabled={uploading}
                   >
                     Cancel
                   </motion.button>
                   
                   <motion.button 
                     onClick={handleCreateNote}
-                    className="px-5 py-2 rounded-lg hover:cursor-pointer"
-                    style={{ backgroundColor: themeColors.primary, color: themeColors.text }}
-                    whileHover={{ scale: 1.05, backgroundColor: '#6f53c2' }}
-                    whileTap={{ scale: 0.95 }}
+                    className="px-5 py-2 rounded-lg font-medium flex items-center"
+                    style={{ 
+                      backgroundColor: themeColors.primary, 
+                      color: themeColors.text
+                    }}
+                    whileHover={{ 
+                      backgroundColor: '#6f53c2',
+                      scale: 1.03
+                    }}
+                    whileTap={{ scale: 0.97 }}
                     disabled={uploading}
                   >
-                    {uploading ? "Uploading..." : "Add Note"}
+                    <Check size={18} className="mr-2" />
+                    {uploading ? "Uploading..." : "Save Note"}
                   </motion.button>
                 </div>
               </div>
@@ -291,13 +388,22 @@ const AddNoteCard = ({ subject_id, onNoteCreated }) => {
         )}
       </AnimatePresence>
       
+      {/* Toast Container */}
       <ToastContainer 
         position="top-right" 
         autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
         theme="dark"
         toastStyle={{ 
           backgroundColor: themeColors.card,
-          color: themeColors.text
+          color: themeColors.text,
+          borderLeft: `4px solid ${themeColors.primary}`
         }}
       />
     </>

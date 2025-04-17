@@ -14,6 +14,7 @@ const AttendanceTable = () => {
     const [students, setStudents] = useState([]);
     const [attendance, setAttendance] = useState({});
     const [deptName, setDeptName] = useState(null);
+    const [attendanceFetched, setAttendanceFetched] = useState(false); // New state to track attendance fetching
     const router = useRouter();
 
     const fetchSession = async () => {
@@ -36,7 +37,6 @@ const AttendanceTable = () => {
     const fetchBatch = async () => {
         try {
             const response = await axios.post('/api/batch/getBatchFromSubject', { subject_id: subjectId });
-            //console.log("Batch API Response:", response.data);
             setSubjectName(response.data.subject.name);
             setBatchName(response.data.batchName);
             setStudents(response.data.students || []);
@@ -52,34 +52,15 @@ const AttendanceTable = () => {
         }
     }, [subjectId]);
 
-    const markAttendance = async (studentId, status) => {
-        try {
-            setAttendance((prev) => ({
-                ...prev,
-                [studentId]: prev[studentId] === status ? "none" : status,
-            }));
-    
-            // Send request to backend
-            await axios.post('/api/session/attendance/createAttendance', {
-                student_id: studentId,
-                session_id: sessionId,
-                status: status.toUpperCase(), // Ensure enum values match
-            });
-    
-        } catch (error) {
-            console.error("Error marking attendance:", error);
-        }
-    };
-
     const getAttendanceDetails = async () => {
         try {
             const response = await axios.post('/api/session/attendance/getAttendanceFromStudent', {
                 subject_id: subjectId,
                 students,
             });
-    
+
             const attendanceData = response.data;
-    
+
             // Merge attendance details into students array
             const updatedStudents = students.map(student => {
                 const details = attendanceData.find(data => data.id === student.id) || {};
@@ -90,55 +71,70 @@ const AttendanceTable = () => {
                     lateDays: details.lateDays || 0,
                 };
             });
-    
+
             setStudents(updatedStudents);
+            setAttendanceFetched(true); // Mark attendance as fetched
         } catch (error) {
             console.error("Error fetching attendance details:", error);
         }
     };
-    
+
     useEffect(() => {
-        if (students.length > 0 && subjectId) {
+        if (students.length > 0 && subjectId && !attendanceFetched) {
             getAttendanceDetails();
         }
-    }, [subjectId, students]);
+    }, [subjectId, students.length, attendanceFetched]); // Only depend on students.length, not the entire array
+
+    const markAttendance = async (studentId, status) => {
+        try {
+            setAttendance((prev) => ({
+                ...prev,
+                [studentId]: prev[studentId] === status ? "none" : status,
+            }));
+
+            // Send request to backend
+            await axios.post('/api/session/attendance/createAttendance', {
+                student_id: studentId,
+                session_id: sessionId,
+                status: status.toUpperCase(), // Ensure enum values match
+            });
+
+        } catch (error) {
+            console.error("Error marking attendance:", error);
+        }
+    };
 
     const createAssignment = async () => {
         try {
-          // First, check if assignment already exists for the session
-          const checkResponse = await axios.post('/api/session/assignment/checkAssignment', {
-            session_id: sessionId,
-          });
-      
-          if (checkResponse.data.exists) {
-            // If assignment exists, redirect to it
-            router.push(`/dashboard/subject/session/assignment/${checkResponse.data.assignmentId}`);
-          } else {
-            // Otherwise, create a new assignment
-            const createResponse = await axios.post('/api/session/assignment/createAssignment', {
-              session_id: sessionId,
+            const checkResponse = await axios.post('/api/session/assignment/checkAssignment', {
+                session_id: sessionId,
             });
-            //console.log("Assignment created:", createResponse.data);
-            router.push(`/dashboard/subject/session/assignment/${createResponse.data.id}`);
-          }
+
+            if (checkResponse.data.exists) {
+                router.push(`/dashboard/subject/session/assignment/${checkResponse.data.assignmentId}`);
+            } else {
+                const createResponse = await axios.post('/api/session/assignment/createAssignment', {
+                    session_id: sessionId,
+                });
+                router.push(`/dashboard/subject/session/assignment/${createResponse.data.id}`);
+            }
         } catch (error) {
-          console.error("Error handling assignment:", error);
+            console.error("Error handling assignment:", error);
         }
     };
-    
+
     // Animation variants
     const containerVariants = {
         hidden: { opacity: 0 },
         visible: { opacity: 1, transition: { staggerChildren: 0.05 } }
     };
-    
+
     const itemVariants = {
         hidden: { y: 20, opacity: 0 },
         visible: { y: 0, opacity: 1, transition: { type: "spring", stiffness: 100 } }
     };
 
     return (
-        // Full dark mode background
         <div className="min-h-screen bg-[#010101] text-[#fefcfd] p-4 md:p-6">
             <motion.div 
                 initial={{ opacity: 0, y: -20 }}
