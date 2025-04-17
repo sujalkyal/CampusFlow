@@ -104,14 +104,14 @@ export default function ContactPage() {
       description: 'Send us an email with your questions or concerns. We typically respond within 24 hours on business days. For urgent matters, please indicate so in your subject line.',
       icon: <Mail className="h-6 w-6 text-[#5f43b2]" />,
       action: 'Send Email',
-      link: 'mailto:support@collegemanagement.com'
+      link: 'mailto:sujalkyal@gmail.com'
     },
     {
       title: 'Call Us',
       description: 'Speak directly with our support team by phone between 8:00 AM and 6:00 PM, Monday through Friday. Our representatives can help resolve your issues quickly.',
       icon: <Phone className="h-6 w-6 text-[#5f43b2]" />,
       action: 'Call Now',
-      link: 'tel:+15551234567'
+      link: 'tel:+917425906088'
     }
   ];
 
@@ -125,17 +125,17 @@ export default function ContactPage() {
   const campusLocations = [
     {
       name: 'Main Campus',
-      address: '123 Education Street, Academic District',
-      phone: '+1 (555) 123-4567',
-      email: 'main@collegemanagement.edu',
-      hours: 'Mon-Fri: 8:00 AM - 6:00 PM'
+      address: '188, Raja S.C. Mallick Road, Jadavpur, Kolkata – 700032, West Bengal, India',
+      phone: '+91 33 2414 6666',
+      email: 'registrar@admin.jdvu.ac.in',
+      hours: 'Mon–Fri: 10:00 AM – 5:00 PM'
     },
     {
-      name: 'Technology Center',
-      address: '456 Innovation Avenue, Tech Park',
-      phone: '+1 (555) 987-6543',
-      email: 'tech@collegemanagement.edu',
-      hours: 'Mon-Fri: 9:00 AM - 5:00 PM'
+      name: 'Salt Lake Campus',
+      address: 'Plot No.8, LB Block, Sector-III, Salt Lake City, Kolkata – 700106, West Bengal, India',
+      phone: '+91 33 2335 5215',
+      email: 'registrar@admin.jdvu.ac.in',
+      hours: 'Mon–Fri: 10:00 AM – 5:00 PM'
     }
   ];
 
@@ -350,7 +350,7 @@ export default function ContactPage() {
 
                 <motion.button
                   type="submit"
-                  className="w-full px-6 py-3 bg-[#5f43b2] hover:bg-[#5f43b2]/90 text-[#fefdfd] rounded-lg font-medium flex items-center justify-center transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full px-6 py-3 bg-[#5f43b2] hover:bg-[#5f43b2]/90 text-[#fefdfd] rounded-lg font-medium flex items-center justify-center transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed hover:cursor-pointer"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   disabled={isSubmitting}
@@ -510,12 +510,12 @@ export default function ContactPage() {
               <MapPin className="h-10 w-10 mx-auto mb-4 text-[#5f43b2]" />
               <h2 className="text-3xl font-bold mb-4">Visit Our Campus</h2>
               <p className="text-[#b1aebb] mb-6">
-                We invite you to experience our campus in person. Our main campus is located in the Academic District, 
-                while our Technology Center is situated in the Tech Park area.
+              We invite you to experience Jadavpur University in person. Our main campus is in Jadavpur, 
+              while the Salt Lake campus hosts other technology and engineering departments.
               </p>
               
               <motion.a
-                href="https://maps.google.com/?q=college+management"
+                href="https://maps.google.com/?q=jadavpur+university"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center px-8 py-4 bg-[#5f43b2] hover:bg-[#5f43b2]/90 text-[#fefdfd] rounded-full font-medium transition-all duration-300"

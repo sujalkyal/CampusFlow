@@ -59,8 +59,8 @@ export default function AboutPage() {
       role: "Lead Developer",
       image: "/placeholder-profile.png",
       links: {
-        github: "https://github.com/",
-        linkedin: "https://linkedin.com/",
+        github: "https://github.com/sujalkyal/college_management_app",
+        linkedin: "http://linkedin.com/in/sujal-kyal-712b9024b",
       },
       bio: "Student Developer with expertise in Next.js, React and modern web technologies for educational platforms."
     },

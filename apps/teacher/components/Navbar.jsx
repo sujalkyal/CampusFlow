@@ -2,15 +2,39 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { signOut } from 'next-auth/react';
-import { LogOut, Menu, X, BookOpen, ChevronDown } from "lucide-react";
+import { signOut, useSession } from 'next-auth/react';
+import { LogOut, Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import axios from 'axios';
 
 const Navbar = () => {
   const router = useRouter();
   const pathname = usePathname();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { data: session, status } = useSession();
+  const [teacher, setTeacher] = useState(null);
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push('/auth/signin');
+    }
+  }, [status, router]);
+
+  useEffect(() => {
+    const fetchTeacher = async () => {
+      try {
+        const res = await axios.get('/api/teacher/getTeacherDetails');
+        setTeacher(res.data.user);
+      } catch (error) {
+        console.error("Failed to fetch teacher details:", error);
+      }
+    };
+
+    if (status === "authenticated") {
+      fetchTeacher();
+    }
+  }, [status]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -47,16 +71,18 @@ const Navbar = () => {
         <div className="max-w-7xl mx-auto flex items-center justify-between py-4 px-6 relative">
           {/* Logo and Brand Name */}
           <Link href="/" className="flex items-center space-x-3 z-20">
-            <div className="w-10 h-10 bg-gradient-to-br from-[#5f43b2] to-[#3a3153] rounded-xl flex items-center justify-center shadow-lg shadow-[#5f43b2]/20">
-              <BookOpen className="w-5 h-5 text-white" />
-            </div>
+            <img 
+                src="/logo_transparent.png" 
+                alt="Logo" 
+                className="w-10 h-10"
+              />
             <motion.span 
               className="text-xl font-bold text-[#fefdfd] tracking-tight"
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2 }}
             >
-              College Management
+              CampusFlow
             </motion.span>
           </Link>
 
@@ -88,22 +114,22 @@ const Navbar = () => {
                 whileTap={{ scale: 0.95 }}
               >
                 <img 
-                  src="/user-placeholder.png" 
+                  src={teacher?.image || "/user-placeholder.png"} 
                   alt="User" 
                   className="object-cover w-full h-full" 
                   onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='white'%3E%3Cpath strokeLinecap='round' strokeLinejoin='round' d='M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z' /%3E%3C/svg%3E";
+                    e.currentTarget.onerror = null;
+                    e.currentTarget.src = "/user-placeholder.png";
                   }}
                 />
               </motion.div>
-              <span className="text-[#fefdfd] text-xs font-medium ml-2 mr-1">Student</span>
-              <ChevronDown className="w-3 h-3 text-[#b1aebb]" />
+              <span className="text-[#fefdfd] text-xs font-medium ml-2 mr-1">{teacher?.name || 'Teacher'}</span>
+              {/* <ChevronDown className="w-3 h-3 text-[#b1aebb]" /> */}
             </div>
             
             <motion.button
               onClick={() => signOut({ callbackUrl: '/auth/signin' })}
-              className="group flex items-center gap-1.5 bg-[#5f43b2]/10 text-[#fefdfd] font-medium px-4 py-1.5 rounded-full border border-[#5f43b2]/20 hover:bg-[#5f43b2] transition-all duration-300"
+              className="group flex items-center gap-1.5 bg-[#5f43b2]/10 text-[#fefdfd] font-medium px-4 py-1.5 rounded-full border border-[#5f43b2]/20 hover:bg-[#5f43b2] transition-all duration-300 hover:cursor-pointer"
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
             >
