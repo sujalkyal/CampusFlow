@@ -14,7 +14,7 @@ const AttendanceTable = () => {
     const [students, setStudents] = useState([]);
     const [attendance, setAttendance] = useState({});
     const [deptName, setDeptName] = useState(null);
-    const [attendanceFetched, setAttendanceFetched] = useState(false); // New state to track attendance fetching
+    const [attendanceDetails, setAttendanceDetails] = useState({});
     const router = useRouter();
 
     const fetchSession = async () => {
@@ -33,6 +33,28 @@ const AttendanceTable = () => {
     useEffect(() => {
         fetchSession();
     }, [sessionId]);
+
+    useEffect(() => {
+        const fetchInitialAttendance = async () => {
+            try {
+                const res = await axios.post('/api/session/attendance/getAttendanceOfSession', {
+                    session_id: sessionId
+                });
+    
+                const attendanceMap = {};
+                res.data.forEach(entry => {
+                    attendanceMap[entry.id] = entry.status.toLowerCase(); // Ensure it's lowercase
+                });
+    
+                setAttendance(attendanceMap);
+            } catch (err) {
+                console.error("Error fetching attendance details:", err);
+            }
+        };
+    
+        fetchInitialAttendance();
+    }, [sessionId]);
+    
 
     const fetchBatch = async () => {
         try {
@@ -59,31 +81,26 @@ const AttendanceTable = () => {
                 students,
             });
 
-            const attendanceData = response.data;
-
-            // Merge attendance details into students array
-            const updatedStudents = students.map(student => {
-                const details = attendanceData.find(data => data.id === student.id) || {};
-                return {
-                    ...student,
-                    presentDays: details.presentDays || 0,
-                    absentDays: details.absentDays || 0,
-                    lateDays: details.lateDays || 0,
+            const attendanceMap = {};
+            for (const detail of response.data) {
+                attendanceMap[detail.id] = {
+                    presentDays: detail.presentDays || 0,
+                    absentDays: detail.absentDays || 0,
+                    lateDays: detail.lateDays || 0,
                 };
-            });
+            }
 
-            setStudents(updatedStudents);
-            setAttendanceFetched(true); // Mark attendance as fetched
+            setAttendanceDetails(attendanceMap);
         } catch (error) {
             console.error("Error fetching attendance details:", error);
         }
     };
 
     useEffect(() => {
-        if (students.length > 0 && subjectId && !attendanceFetched) {
+        if (students.length > 0 && subjectId) {
             getAttendanceDetails();
         }
-    }, [subjectId, students.length, attendanceFetched]); // Only depend on students.length, not the entire array
+    }, [subjectId, students]); // Only depend on students.length, not the entire array
 
     const markAttendance = async (studentId, status) => {
         try {
@@ -98,6 +115,8 @@ const AttendanceTable = () => {
                 session_id: sessionId,
                 status: status.toUpperCase(), // Ensure enum values match
             });
+
+            getAttendanceDetails(); // Refresh attendance details after marking
 
         } catch (error) {
             console.error("Error marking attendance:", error);
@@ -205,17 +224,17 @@ const AttendanceTable = () => {
                                         <div className="flex items-center">
                                             <div className="w-3 h-3 rounded-full bg-green-400 mr-2"></div>
                                             <span className="text-[#b1aebb]">Present: </span>
-                                            <span className="ml-1 font-bold text-green-400">{student.presentDays || 0}</span>
+                                            <span className="ml-1 font-bold text-green-400">{attendanceDetails[student.id]?.presentDays || 0}</span>
                                         </div>
                                         <div className="flex items-center">
                                             <div className="w-3 h-3 rounded-full bg-red-400 mr-2"></div>
                                             <span className="text-[#b1aebb]">Absent: </span>
-                                            <span className="ml-1 font-bold text-red-400">{student.absentDays || 0}</span>
+                                            <span className="ml-1 font-bold text-red-400">{attendanceDetails[student.id]?.absentDays || 0}</span>
                                         </div>
                                         <div className="flex items-center">
                                             <div className="w-3 h-3 rounded-full bg-yellow-400 mr-2"></div>
                                             <span className="text-[#b1aebb]">Late: </span>
-                                            <span className="ml-1 font-bold text-yellow-400">{student.lateDays || 0}</span>
+                                            <span className="ml-1 font-bold text-yellow-400">{attendanceDetails[student.id]?.lateDays || 0}</span>
                                         </div>
                                     </div>
                                 </div>

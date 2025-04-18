@@ -34,6 +34,27 @@ export async function POST(request) {
       );
     }
 
+    // Check if attendance already exists
+    const existing = await prisma.attendance.findUnique({
+      where: {
+        student_id_session_id: { student_id, session_id },
+      },
+    });
+
+    // If status is same, delete the record (toggle off)
+    if (existing && existing.status === status) {
+      await prisma.attendance.delete({
+        where: {
+          student_id_session_id: { student_id, session_id },
+        },
+      });
+
+      return NextResponse.json(
+        { message: "Attendance removed" },
+        { status: 200 }
+      );
+    }
+
     // Upsert attendance: update if exists, otherwise create
     const attendance = await prisma.attendance.upsert({
       where: {
