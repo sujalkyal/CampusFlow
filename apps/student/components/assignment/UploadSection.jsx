@@ -43,35 +43,6 @@ export default function FilesUploadSection() {
     fetchSubmission();
   }, [sessionId]);
 
-  const handleDelete = (file) => {
-    setFiles((prev) => prev.filter((f) => f !== file));
-    setDeleteFiles((prev) => [...prev, file]);
-    toast.success("File removed!");
-  };
-
-  const handleSubmit = async () => {
-    if (!submissionId) {
-      toast.error("No submission found.");
-      return;
-    }
-
-    try {
-      await axios.post("/api/student/updateSubmissionFiles", {
-        submission_id: submissionId,
-        files,
-      });
-
-      for (const file of deleteFiles) {
-        await edgestore.publicFiles.delete({ url: file });
-      }
-
-      toast.success("Files updated successfully!");
-    } catch (error) {
-      toast.error("Failed to update files");
-      console.error("Error:", error);
-    }
-  };
-
   const createSubmission = async () => {
     try {
       const response = await axios.post("/api/session/assignment/getFromSession", {
@@ -100,6 +71,37 @@ export default function FilesUploadSection() {
     }
   };
 
+  const handleDelete = (file) => {
+    //remove the file from the list of files
+    setFiles((prev) => prev.filter((f) => f !== file));
+    //add the file to the list of files to be deleted
+    setDeleteFiles((prev) => [...prev, file]);
+    //show success message
+    toast.success("File deleted successfully!");
+  };
+
+  const handleSubmit = async () => {
+    if (!submissionId) {
+      toast.error("No submission found.");
+      return;
+    }
+
+    try {
+      await axios.post("/api/student/updateSubmissionFiles", {
+        submission_id: submissionId,
+        files,
+      });
+
+      for (const file of deleteFiles) {
+        await edgestore.publicFiles.delete({ url: file });
+      }
+
+      toast.success("Files updated successfully!");
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
   const handleFileUpload = async (inputFiles) => {
     if (!inputFiles || !submissionId) {
       toast.error("Submission not initialized.");
@@ -116,12 +118,6 @@ export default function FilesUploadSection() {
 
       setFiles((prev) => [...prev, ...uploadedFiles]);
 
-      await axios.post("/api/student/updateSubmissionFiles", {
-        submission_id: submissionId,
-        files: uploadedFiles,
-      });
-
-      toast.success("Files uploaded and linked to submission!");
     } catch (error) {
       toast.error("Upload failed");
       console.error(error);
