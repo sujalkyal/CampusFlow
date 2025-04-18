@@ -28,7 +28,7 @@ const Subject = () => {
   const [refresh2, setRefresh2] = useState(false);
   const router = useRouter();
   const [loading, setLoading] = useState(true);
-  let totalClasses = 0;
+  const [totalClasses, setTotalClasses] = useState(0);
 
   const handleSessionCreated = () => setRefresh((prev) => !prev);
   const handleNoteCreation = () => setRefresh2((prev) => !prev);
@@ -67,7 +67,7 @@ const Subject = () => {
 
         // Students
         setStudents(studentsRes.data.students);
-        totalClasses = studentsRes.data.sessionCount;
+        setTotalClasses(studentsRes.data.sessionCount);
 
         // Sessions
         const sortedSessions = sessionsRes.data.sort((a, b) => new Date(a.date) - new Date(b.date));
