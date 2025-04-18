@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import EditTeacherPopup from '../../components/Popup';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useSession } from 'next-auth/react';
 
 const SubjectDashboard = () => {
   const [teacher, setTeacher] = useState(null);
@@ -12,6 +13,8 @@ const SubjectDashboard = () => {
   const [upcomingSessions, setUpcomingSessions] = useState([]);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const router = useRouter();
+  const { status } = useSession(); // Assuming you have a session management system
+  const [isLoading, setIsLoading] = useState(true);
 
   const fetchTeacherDetails = async () => {
     try {
@@ -40,9 +43,31 @@ const SubjectDashboard = () => {
   }
 
   useEffect(() => {
-    fetchUpcomingSessions();
-    fetchTeacherDetails();
-  }, []);
+    if (status === "loading") {
+      setIsLoading(true); // Show loading while checking session
+    } else if (status === "authenticated") {
+      // Fetch all data when authenticated
+      const fetchData = async () => {
+        await Promise.all([fetchTeacherDetails(), fetchUpcomingSessions()]);
+        setIsLoading(false); // Only set loading to false when both data fetching completes
+      };
+      fetchData();
+    } else if (status === "unauthenticated") {
+      router.push('/auth/signin'); // Redirect to sign-in page if unauthenticated
+    }
+  }, [status]);
+
+  if (status === "loading" || isLoading) {
+    return (
+      <div className="flex justify-center items-center h-screen bg-[#010101]">
+        <div className="text-lg font-semibold text-[#fefdfd]">Loading...</div>
+      </div>
+    );
+  }
+
+  if (status === "unauthenticated") {
+    return null; // Prevent rendering if unauthenticated
+  }
 
   const handleEditClick = () => {
     setIsPopupOpen(true);
@@ -71,7 +96,7 @@ const SubjectDashboard = () => {
 
   return (
     <motion.div 
-      className="min-h-screen text-[#fefdfd]"
+      className="min-h-screen text-[#fefdfd] overflow-y-auto custom-scrollbar"
       style={{ 
         background: "#010101",
         backgroundImage: "radial-gradient(circle at 50% 0%, #3a3153 0%, #010101 70%)",
@@ -213,7 +238,7 @@ const SubjectDashboard = () => {
             </div>
             
             {upcomingSessions.length > 0 ? (
-              <div className="overflow-x-auto pb-4">
+              <div className="overflow-x-auto pb-4 custom-scrollbar">
                 <div className="flex gap-4 min-w-max">
                   {upcomingSessions.map((session, index) => (
                     <motion.div
@@ -221,7 +246,6 @@ const SubjectDashboard = () => {
                       className="w-64 bg-[#fefdfd]/5 backdrop-blur-md rounded-lg overflow-hidden flex flex-col"
                       variants={itemVariants}
                       whileHover={{ 
-                        y: -5, 
                         boxShadow: "0 20px 30px -10px rgba(0, 0, 0, 0.3)"
                       }}
                       onClick={() => router.push(`/dashboard/subject/session/${session.id}`)}
@@ -284,7 +308,7 @@ const SubjectDashboard = () => {
               />
             </div>
             
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 max-h-[500px] overflow-y-auto custom-scrollbar pr-2">
               {subjects.map((subject, index) => (
                 <motion.div
                   key={index}
