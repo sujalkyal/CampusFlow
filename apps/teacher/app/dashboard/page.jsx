@@ -156,7 +156,7 @@ const SubjectDashboard = () => {
                       transition={{ duration: 3, repeat: Infinity }}
                     />
                     <img 
-                      src={teacher.profilePic || "/api/placeholder/96/96"} 
+                      src={teacher.profilePic || "/user-placeholder.png"} 
                       alt="Teacher" 
                       className="relative w-24 h-24 rounded-full object-cover"
                     />
@@ -248,7 +248,6 @@ const SubjectDashboard = () => {
                       whileHover={{ 
                         boxShadow: "0 20px 30px -10px rgba(0, 0, 0, 0.3)"
                       }}
-                      onClick={() => router.push(`/dashboard/subject/session/${session.id}`)}
                     >
                       <div className="bg-gradient-to-r from-[#5f43b2] to-[#3a3153] py-3 px-4">
                         <div className="flex justify-between items-center">
@@ -272,6 +271,7 @@ const SubjectDashboard = () => {
                           className="mt-4 w-full py-2 bg-[#010101]/80 text-[#fefdfd] rounded-md text-sm hover:cursor-pointer"
                           whileHover={{ backgroundColor: "rgba(95, 67, 178, 0.3)" }}
                           whileTap={{ scale: 0.98 }}
+                          onClick={() => router.push(`/dashboard/subject/session/${session.id}`)}
                         >
                           View Details
                         </motion.button>
@@ -316,7 +316,6 @@ const SubjectDashboard = () => {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  whileHover={{ scale: 1.05 }}
                   onClick={() => router.push(`/dashboard/subject/${subject.id}`)}
                 >
                   {/* Glassmorphism Effect */}
