@@ -121,16 +121,14 @@ const AddNoteCard = ({ subject_id, onNoteCreated }) => {
   };
   
   const modalVariants = {
-    hidden: { scale: 0.9, y: 20, opacity: 0 },
+    hidden: { scale: 0.8, opacity: 0 },
     visible: { 
       scale: 1, 
-      y: 0, 
       opacity: 1,
       transition: { type: "spring", damping: 25, stiffness: 300 }
     },
     exit: { 
-      scale: 0.95, 
-      y: 10, 
+      scale: 0.8, 
       opacity: 0,
       transition: { duration: 0.2 }
     }
@@ -139,14 +137,10 @@ const AddNoteCard = ({ subject_id, onNoteCreated }) => {
   return (
     <>
       {/* Add Note Button */}
-      <motion.div
-        className="w-full"
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
-      >
+      <motion.div className="w-full">
         <button
           onClick={() => setShowPopup(true)}
-          className="w-full p-4 rounded-xl border-2 border-dashed flex flex-col items-center justify-center transition-colors duration-300"
+          className="w-full p-4 rounded-xl border-2 border-dashed flex flex-col items-center justify-center transition-colors duration-300 hover:cursor-pointer"
           style={{ 
             borderColor: themeColors.accent,
             backgroundColor: 'rgba(58, 49, 83, 0.2)',
@@ -173,214 +167,235 @@ const AddNoteCard = ({ subject_id, onNoteCreated }) => {
       <AnimatePresence>
         {showPopup && (
           <motion.div 
-            className="fixed inset-0 flex items-center justify-center z-50"
-            variants={overlayVariants}
+            className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden"
             initial="hidden"
             animate="visible"
             exit="hidden"
-            transition={{ duration: 0.2 }}
-            style={{ backgroundColor: 'rgba(0, 0, 0, 0.85)' }}
+            variants={overlayVariants}
+            style={{ backdropFilter: 'blur(5px)' }}
           >
-            <motion.div 
-              className="rounded-2xl shadow-2xl overflow-hidden"
+            {/* Opaque Background Overlay */}
+            <div 
+              className="fixed inset-0" 
+              style={{ backgroundColor: 'rgba(0, 0, 0, 0.85)' }} 
+              onClick={handleClosePopup}
+            ></div>
+            
+            {/* Modal Content */}
+            <motion.div
+              className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 w-full max-w-lg mx-auto"
+              onClick={(e) => e.stopPropagation()}
               variants={modalVariants}
               initial="hidden"
               animate="visible"
               exit="exit"
             >
-              <div className="w-[450px] p-6" style={{ backgroundColor: themeColors.secondary }}>
+              <div 
+                className="rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto"
+                style={{ backgroundColor: themeColors.secondary }}
+              >
                 {/* Header */}
-                <div className="flex justify-between items-center mb-6">
-                  <h2 
-                    className="text-2xl font-semibold bg-gradient-to-r from-purple-400 to-indigo-500 bg-clip-text text-transparent"
-                  >
-                    Create New Note
-                  </h2>
-                  <motion.button
-                    onClick={handleClosePopup}
-                    whileHover={{ scale: 1.1, rotate: 90 }}
-                    whileTap={{ scale: 0.9 }}
-                    className="p-1 rounded-full"
-                    style={{ backgroundColor: 'rgba(58, 49, 83, 0.4)' }}
-                  >
-                    <X size={18} color={themeColors.faded} />
-                  </motion.button>
+                <div className="sticky top-0 z-20 p-6 pb-2" style={{ backgroundColor: themeColors.secondary }}>
+                  <div className="flex justify-between items-center">
+                    <h2 
+                      className="text-2xl font-semibold bg-gradient-to-r from-purple-400 to-indigo-500 bg-clip-text text-transparent"
+                    >
+                      Create New Note
+                    </h2>
+                    <motion.button
+                      onClick={handleClosePopup}
+                      whileHover={{ scale: 1.1, rotate: 90 }}
+                      whileTap={{ scale: 0.9 }}
+                      className="p-1 rounded-full"
+                      style={{ backgroundColor: 'rgba(58, 49, 83, 0.4)' }}
+                    >
+                      <X size={18} color={themeColors.faded} />
+                    </motion.button>
+                  </div>
+                  <div 
+                    className="w-full h-px mt-4" 
+                    style={{ backgroundColor: 'rgba(58, 49, 83, 0.5)' }}
+                  ></div>
                 </div>
                 
-                {/* Form */}
-                <div className="space-y-5">
-                  {/* Title Input */}
-                  <div>
-                    <label 
-                      className="block text-sm font-medium mb-2" 
-                      style={{ color: themeColors.faded }}
-                    >
-                      Title
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="Enter a title for your note"
-                      value={title}
-                      onChange={(e) => setTitle(e.target.value)}
-                      className="w-full p-3 rounded-lg focus:ring-2 focus:ring-opacity-50 focus:outline-none transition-all"
-                      style={{ 
-                        backgroundColor: 'rgba(58, 49, 83, 0.4)', 
-                        color: themeColors.text,
-                        border: `1px solid ${themeColors.accent}`,
-                        focusRing: themeColors.primary
-                      }}
-                    />
-                  </div>
-                  
-                  {/* Description Textarea */}
-                  <div>
-                    <label 
-                      className="block text-sm font-medium mb-2" 
-                      style={{ color: themeColors.faded }}
-                    >
-                      Description
-                    </label>
-                    <textarea
-                      placeholder="Add some details about this note"
-                      value={description}
-                      onChange={(e) => setDescription(e.target.value)}
-                      rows="4"
-                      className="w-full p-3 rounded-lg focus:ring-2 focus:ring-opacity-50 focus:outline-none transition-all custom-scrollbar"
-                      style={{ 
-                        backgroundColor: 'rgba(58, 49, 83, 0.4)', 
-                        color: themeColors.text,
-                        border: `1px solid ${themeColors.accent}`,
-                        resize: 'vertical'
-                      }}
-                    />
-                  </div>
-                  
-                  {/* File Upload */}
-                  <div>
-                    <label 
-                      className="block text-sm font-medium mb-2" 
-                      style={{ color: themeColors.faded }}
-                    >
-                      Attachments
-                    </label>
-                    <motion.div
-                      className="relative overflow-hidden rounded-lg"
-                      whileHover={{ 
-                        backgroundColor: 'rgba(58, 49, 83, 0.5)',
-                        borderColor: themeColors.primary
-                      }}
-                      initial={{ backgroundColor: 'rgba(58, 49, 83, 0.3)' }}
-                    >
-                      <input
-                        type="file"
-                        multiple
-                        onChange={(e) => handleFileUpload(e.target.files)}
-                        className="opacity-0 absolute inset-0 w-full h-full cursor-pointer z-10"
-                        disabled={uploading}
-                      />
-                      <div 
-                        className="w-full p-4 flex items-center justify-center cursor-pointer border border-dashed"
-                        style={{ borderColor: themeColors.accent }}
+                {/* Form Content */}
+                <div className="p-6 pt-4">
+                  <div className="space-y-5">
+                    {/* Title Input */}
+                    <div>
+                      <label 
+                        className="block text-sm font-medium mb-2" 
+                        style={{ color: themeColors.faded }}
                       >
-                        <Upload size={18} className="mr-3" style={{ color: themeColors.primary }} />
-                        <span style={{ color: themeColors.faded }}>
-                          {uploading ? `Uploading (${uploadProgress}%)` : "Click to upload files"}
-                        </span>
-                      </div>
-                    </motion.div>
-
-                    {/* Upload Progress */}
-                    {uploading && (
-                      <div className="mt-2">
-                        <div className="w-full h-1 bg-gray-700 rounded-full overflow-hidden">
-                          <motion.div 
-                            className="h-full"
-                            style={{ backgroundColor: themeColors.primary }}
-                            initial={{ width: "0%" }}
-                            animate={{ width: `${uploadProgress}%` }}
-                          />
+                        Title
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="Enter a title for your note"
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        className="w-full p-3 rounded-lg focus:ring-2 focus:ring-opacity-50 focus:outline-none transition-all"
+                        style={{ 
+                          backgroundColor: 'rgba(58, 49, 83, 0.4)', 
+                          color: themeColors.text,
+                          border: `1px solid ${themeColors.accent}`
+                        }}
+                      />
+                    </div>
+                    
+                    {/* Description Textarea */}
+                    <div>
+                      <label 
+                        className="block text-sm font-medium mb-2" 
+                        style={{ color: themeColors.faded }}
+                      >
+                        Description
+                      </label>
+                      <textarea
+                        placeholder="Add some details about this note"
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        rows="4"
+                        className="w-full p-3 rounded-lg focus:ring-2 focus:ring-opacity-50 focus:outline-none transition-all custom-scrollbar"
+                        style={{ 
+                          backgroundColor: 'rgba(58, 49, 83, 0.4)', 
+                          color: themeColors.text,
+                          border: `1px solid ${themeColors.accent}`,
+                          resize: 'vertical'
+                        }}
+                      />
+                    </div>
+                    
+                    {/* File Upload */}
+                    <div>
+                      <label 
+                        className="block text-sm font-medium mb-2" 
+                        style={{ color: themeColors.faded }}
+                      >
+                        Attachments
+                      </label>
+                      <motion.div
+                        className="relative overflow-hidden rounded-lg"
+                        whileHover={{ 
+                          backgroundColor: 'rgba(58, 49, 83, 0.5)',
+                          borderColor: themeColors.primary
+                        }}
+                        initial={{ backgroundColor: 'rgba(58, 49, 83, 0.3)' }}
+                      >
+                        <input
+                          type="file"
+                          multiple
+                          onChange={(e) => handleFileUpload(e.target.files)}
+                          className="opacity-0 absolute inset-0 w-full h-full cursor-pointer z-10"
+                          disabled={uploading}
+                        />
+                        <div 
+                          className="w-full p-4 flex items-center justify-center cursor-pointer border border-dashed"
+                          style={{ borderColor: themeColors.accent }}
+                        >
+                          <Upload size={18} className="mr-3" style={{ color: themeColors.primary }} />
+                          <span style={{ color: themeColors.faded }}>
+                            {uploading ? `Uploading (${uploadProgress}%)` : "Click to upload files"}
+                          </span>
                         </div>
+                      </motion.div>
+
+                      {/* Upload Progress */}
+                      {uploading && (
+                        <div className="mt-2">
+                          <div className="w-full h-2 bg-gray-700 rounded-full overflow-hidden">
+                            <motion.div 
+                              className="h-full"
+                              style={{ backgroundColor: themeColors.primary }}
+                              initial={{ width: "0%" }}
+                              animate={{ width: `${uploadProgress}%` }}
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    
+                    {/* Uploaded Files List */}
+                    {fileUrls.length > 0 && (
+                      <div 
+                        className="mt-2 max-h-40 overflow-y-auto rounded-lg p-3 custom-scrollbar"
+                        style={{ backgroundColor: 'rgba(58, 49, 83, 0.2)' }}
+                      >
+                        <p className="text-xs mb-2" style={{ color: themeColors.faded }}>
+                          {fileUrls.length} file{fileUrls.length !== 1 ? 's' : ''} attached
+                        </p>
+                        <ul className="space-y-2">
+                          {fileUrls.map((url, index) => (
+                            <motion.li 
+                              key={index}
+                              className="flex items-center justify-between rounded-lg p-2"
+                              style={{ backgroundColor: 'rgba(58, 49, 83, 0.4)' }}
+                              initial={{ opacity: 0, x: -10 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ delay: index * 0.05 }}
+                            >
+                              <div className="flex items-center truncate mr-2">
+                                <File size={14} className="mr-2 flex-shrink-0" style={{ color: themeColors.primary }} />
+                                <span className="text-xs truncate" style={{ color: themeColors.text }}>
+                                  {url.split('/').pop()}
+                                </span>
+                              </div>
+                              <motion.button
+                                onClick={() => removeFile(index)}
+                                whileHover={{ scale: 1.2 }}
+                                whileTap={{ scale: 0.9 }}
+                                className="bg-opacity-20 bg-red-500 hover:bg-opacity-40 p-1 rounded-full"
+                              >
+                                <X size={14} style={{ color: '#ff6b6b' }} />
+                              </motion.button>
+                            </motion.li>
+                          ))}
+                        </ul>
                       </div>
                     )}
                   </div>
                   
-                  {/* Uploaded Files List */}
-                  {fileUrls.length > 0 && (
-                    <div 
-                      className="mt-2 max-h-36 overflow-y-auto rounded-lg p-3 custom-scrollbar"
-                      style={{ backgroundColor: 'rgba(58, 49, 83, 0.2)' }}
+                  {/* Action Buttons */}
+                  <div 
+                    className="flex justify-end space-x-3 mt-8 pt-4"
+                    style={{ borderTop: `1px solid rgba(58, 49, 83, 0.3)` }}
+                  >
+                    <motion.button 
+                      onClick={handleClosePopup}
+                      className="px-5 py-2 rounded-lg font-medium"
+                      style={{ 
+                        backgroundColor: 'rgba(58, 49, 83, 0.4)', 
+                        color: themeColors.faded,
+                        border: `1px solid ${themeColors.accent}` 
+                      }}
+                      whileHover={{ 
+                        backgroundColor: 'rgba(58, 49, 83, 0.6)',
+                        scale: 1.03
+                      }}
+                      whileTap={{ scale: 0.97 }}
+                      disabled={uploading}
                     >
-                      <p className="text-xs mb-2" style={{ color: themeColors.faded }}>
-                        {fileUrls.length} file{fileUrls.length !== 1 ? 's' : ''} attached
-                      </p>
-                      <ul className="space-y-2">
-                        {fileUrls.map((url, index) => (
-                          <motion.li 
-                            key={index}
-                            className="flex items-center justify-between rounded-lg p-2"
-                            style={{ backgroundColor: 'rgba(58, 49, 83, 0.4)' }}
-                            initial={{ opacity: 0, x: -10 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: index * 0.05 }}
-                          >
-                            <div className="flex items-center truncate mr-2">
-                              <File size={14} className="mr-2 flex-shrink-0" style={{ color: themeColors.primary }} />
-                              <span className="text-xs truncate" style={{ color: themeColors.text }}>
-                                {url.split('/').pop()}
-                              </span>
-                            </div>
-                            <motion.button
-                              onClick={() => removeFile(index)}
-                              whileHover={{ scale: 1.2 }}
-                              whileTap={{ scale: 0.9 }}
-                              className="bg-opacity-20 bg-red-500 hover:bg-opacity-40 p-1 rounded-full"
-                            >
-                              <X size={14} style={{ color: '#ff6b6b' }} />
-                            </motion.button>
-                          </motion.li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                </div>
-                
-                {/* Action Buttons */}
-                <div className="flex justify-end space-x-3 mt-8">
-                  <motion.button 
-                    onClick={handleClosePopup}
-                    className="px-5 py-2 rounded-lg font-medium"
-                    style={{ 
-                      backgroundColor: 'rgba(58, 49, 83, 0.4)', 
-                      color: themeColors.faded,
-                      border: `1px solid ${themeColors.accent}` 
-                    }}
-                    whileHover={{ 
-                      backgroundColor: 'rgba(58, 49, 83, 0.6)',
-                      scale: 1.03
-                    }}
-                    whileTap={{ scale: 0.97 }}
-                    disabled={uploading}
-                  >
-                    Cancel
-                  </motion.button>
-                  
-                  <motion.button 
-                    onClick={handleCreateNote}
-                    className="px-5 py-2 rounded-lg font-medium flex items-center"
-                    style={{ 
-                      backgroundColor: themeColors.primary, 
-                      color: themeColors.text
-                    }}
-                    whileHover={{ 
-                      backgroundColor: '#6f53c2',
-                      scale: 1.03
-                    }}
-                    whileTap={{ scale: 0.97 }}
-                    disabled={uploading}
-                  >
-                    <Check size={18} className="mr-2" />
-                    {uploading ? "Uploading..." : "Save Note"}
-                  </motion.button>
+                      Cancel
+                    </motion.button>
+                    
+                    <motion.button 
+                      onClick={handleCreateNote}
+                      className="px-5 py-2 rounded-lg font-medium flex items-center"
+                      style={{ 
+                        backgroundColor: themeColors.primary, 
+                        color: themeColors.text
+                      }}
+                      whileHover={{ 
+                        backgroundColor: '#6f53c2',
+                        scale: 1.03
+                      }}
+                      whileTap={{ scale: 0.97 }}
+                      disabled={uploading}
+                    >
+                      <Check size={18} className="mr-2" />
+                      {uploading ? "Uploading..." : "Save Note"}
+                    </motion.button>
+                  </div>
                 </div>
               </div>
             </motion.div>

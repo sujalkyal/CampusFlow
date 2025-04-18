@@ -27,8 +27,7 @@ const Subject = () => {
   const [refresh, setRefresh] = useState(false);
   const [refresh2, setRefresh2] = useState(false);
   const router = useRouter();
-  const [showAll, setShowAll] = useState(false);
-  const visibleStudents = showAll ? students : students.slice(0, 10);
+  const [loading, setLoading] = useState(true);
   let totalClasses = 0;
 
   const handleSessionCreated = () => setRefresh((prev) => !prev);
@@ -58,48 +57,47 @@ const Subject = () => {
   useEffect(() => {
     if (!subject_id) return;
 
-    const fetchStudents = async () => {
+    const fetchAll = async () => {
       try {
-        const res = await axios.post('/api/subject/getStudents', { subject_id });
-        if (res.status !== 200) throw new Error('Failed to fetch students');
-        totalClasses = res.data.sessionCount;
-        setStudents(res.data.students);
+        const [studentsRes, sessionsRes, notesRes] = await Promise.all([
+          axios.post('/api/subject/getStudents', { subject_id }),
+          axios.post('/api/subject/session/getAllSessions', { subject_id }),
+          axios.post('/api/subject/notes/getAllNotes', { subject_id }),
+        ]);
+
+        // Students
+        setStudents(studentsRes.data.students);
+        totalClasses = studentsRes.data.sessionCount;
+
+        // Sessions
+        const sortedSessions = sessionsRes.data.sort((a, b) => new Date(a.date) - new Date(b.date));
+        setSessions(sortedSessions);
+
+        // Notes
+        setNotes(notesRes.data);
       } catch (error) {
-        console.error('Error fetching students:', error);
+        console.error('Error fetching data:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchStudents();
-  }, []);
+    fetchAll();
+  }, [subject_id, refresh, refresh2]);
 
-  useEffect(() => {
-    if (!subject_id) return;
-
-    const fetchNotes = async () => {
-      try {
-        const res = await axios.post('/api/subject/notes/getAllNotes', { subject_id });
-        setNotes(res.data);
-      } catch (error) {
-        console.error('Error fetching notes:', error);
-      }
-    };
-
-    fetchNotes();
-  }, [refresh2]);
-
-  useEffect(() => {
-    const fetchSessions = async () => {
-      try {
-        const res = await axios.post('/api/subject/session/getAllSessions', { subject_id });
-        const sorted = res.data.sort((a, b) => new Date(a.date) - new Date(b.date));
-        setSessions(sorted);
-      } catch (error) {
-        console.error('Error fetching sessions:', error);
-      }
-    };
-
-    fetchSessions();
-  }, [refresh]);
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen text-white" style={{ backgroundColor: themeColors.secondary }}>
+        <div className="flex flex-col items-center">
+          <svg className="animate-spin h-10 w-10 text-purple-500 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+          </svg>
+          <p className="text-lg font-medium" style={{ color: themeColors.faded }}>Loading your subject...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <motion.div
@@ -150,8 +148,7 @@ const Subject = () => {
                   initial={{ opacity: 0, x: 30 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.08 }}
-                  whileHover={{ 
-                    scale: 1.00, 
+                  whileHover={{
                     boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.2)",
                     borderColor: themeColors.primary
                   }}
@@ -203,9 +200,11 @@ const Subject = () => {
           }}
           variants={itemVariants}
         >
-          <h2 className="text-2xl font-semibold mb-6 bg-gradient-to-r from-purple-400 to-indigo-500 bg-clip-text text-transparent">Student List</h2>
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-semibold bg-gradient-to-r from-purple-400 to-indigo-500 bg-clip-text text-transparent">Student List</h2>
+          </div>
           <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar rounded-xl">
-            {visibleStudents.map((student, index) => (
+            {students.map((student, index) => (
               <motion.div 
                 key={student.id} 
                 className="flex items-center justify-between p-3 rounded-xl"
@@ -217,7 +216,7 @@ const Subject = () => {
               >
                 <div className="flex items-center">
                   <img
-                    src={student.image || '/api/placeholder/40/40'}
+                    src={student.image || '/user-placeholder.png'}
                     alt={student.name}
                     className="h-10 w-10 rounded-full object-cover mr-3 border-2"
                     style={{ borderColor: themeColors.primary }}
@@ -260,7 +259,9 @@ const Subject = () => {
           }}
           variants={itemVariants}
         >
-          <h2 className="text-2xl font-semibold mb-6 bg-gradient-to-r from-purple-400 to-indigo-500 bg-clip-text text-transparent">Notes</h2>
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-semibold bg-gradient-to-r from-purple-400 to-indigo-500 bg-clip-text text-transparent">Notes</h2>
+          </div>
           <div className="flex flex-col gap-4">
             {notes.map((note, index) => (
               <motion.div
@@ -279,8 +280,8 @@ const Subject = () => {
               </motion.div>
             ))}
             <motion.div 
-              whileHover={{ scale: 0.98 }}
-              whileTap={{ scale: 0.98 }}
+              whileHover={{ scale: 0.97 }}
+              whileTap={{ scale: 0.97 }}
             >
               <AddNoteCard subject_id={subject_id} onNoteCreated={handleNoteCreation} />
             </motion.div>
