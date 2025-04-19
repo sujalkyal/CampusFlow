@@ -156,7 +156,7 @@ const SubjectDashboard = () => {
                       transition={{ duration: 3, repeat: Infinity }}
                     />
                     <img 
-                      src={teacher.profilePic || "/user-placeholder.png"} 
+                      src={teacher.image || "/user-placeholder.png"} 
                       alt="Teacher" 
                       className="relative w-24 h-24 rounded-full object-cover"
                     />
@@ -206,10 +206,6 @@ const SubjectDashboard = () => {
                         <div className="bg-[#010101]/50 p-2 rounded-md">
                           <span className="text-[#b1aebb] text-sm">Upcoming Sessions:</span>
                           <p className="text-[#fefdfd]">{upcomingSessions.length}</p>
-                        </div>
-                        <div className="bg-[#010101]/50 p-2 rounded-md">
-                          <span className="text-[#b1aebb] text-sm">Last Login:</span>
-                          <p className="text-[#fefdfd]">{new Date().toLocaleDateString()}</p>
                         </div>
                       </div>
                     </div>

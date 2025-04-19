@@ -12,9 +12,7 @@ export async function POST(request) {
 
     try {
         const teacherId = session.user.id;
-        const { name, email, newPassword, oldPassword, dept_name, batches, subjects } = await request.json();
-        //console.log('Request body:', { name, email, newPassword, oldPassword, dept_name, batches, subjects });
-        
+        const { name, email, newPassword, oldPassword, dept_name, batches, subjects, image } = await request.json();
 
         const teacher = await prisma.teacher.findFirst({ where: { id: teacherId } });
         if (!teacher) {
@@ -72,18 +70,13 @@ export async function POST(request) {
             data: {
                 name,
                 email,
+                image: image=="" ? teacher.image : image,
                 password: hashedPassword,
                 dept_id: department.id,
                 batches: { set: filteredBatches },
                 subjects: { set: filteredSubjects }
             }
         });
-
-        // Assign teacher_id to newly added subjects
-        // await prisma.subject.updateMany({
-        //     where: { id: { in: filteredSubjects } },
-        //     data: { teacher_id: teacherId }
-        // });
 
         return NextResponse.json(updatedTeacher, { status: 200 });
     } catch (error) {

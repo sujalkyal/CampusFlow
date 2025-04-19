@@ -12,7 +12,7 @@ export async function POST(request) {
 
     try {
         const studentId = session.user.id;
-        const { name, email, newPassword, oldPassword, batch_id } = await request.json();
+        const { name, email, newPassword, oldPassword, batch_id, image } = await request.json();
 
         const student = await prisma.student.findUnique({ where: { id: studentId } });
         if (!student) {
@@ -46,6 +46,7 @@ export async function POST(request) {
             data: {
                 name,
                 email,
+                image,
                 password: hashedPassword,
                 batch_id: batch.id
             }
