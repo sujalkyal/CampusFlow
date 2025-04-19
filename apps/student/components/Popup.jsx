@@ -1,18 +1,24 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { motion } from "framer-motion";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { Trash2 } from "lucide-react";
+import { useEdgeStore } from "../app/lib/edgestore";
+
 import "react-toastify/dist/ReactToastify.css";
 
 const EditStudentPopup = ({ isOpen, onClose, student }) => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    image: "",
     oldPassword: "",
     newPassword: "",
     batch_id: "",
   });
   const [batches, setBatches] = useState([]);
+  const { edgestore } = useEdgeStore();
 
   useEffect(() => {
     const fetchBatches = async () => {
@@ -38,6 +44,7 @@ const EditStudentPopup = ({ isOpen, onClose, student }) => {
       setFormData({
         name: student.name,
         email: student.email,
+        image: student.image || "",
         oldPassword: "",
         newPassword: "",
         batch_id: student.batch_id || "",
@@ -57,6 +64,37 @@ const EditStudentPopup = ({ isOpen, onClose, student }) => {
     });
   };
 
+  const handleImageUpload = async (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+  
+      if (!file.type.startsWith("image/")) {
+        toast.error("Only image files are allowed.");
+        return;
+      }
+  
+      try {
+        const res = await edgestore.publicFiles.upload({
+          file,
+        });
+  
+        setFormData((prev) => ({ ...prev, image: res.url }));
+      } catch (error) {
+        console.error("Image upload failed:", error);
+        toast.error("Image upload failed.");
+      }
+    };
+  
+    const handleImageRemove = async () => {
+      try {
+        await edgestore.publicFiles.delete({ url: formData.image });
+        setFormData((prev) => ({ ...prev, image: "" }));
+      } catch (error) {
+        console.error("Image removal failed:", error);
+        toast.error("Failed to remove image.");
+      }
+    };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -67,7 +105,7 @@ const EditStudentPopup = ({ isOpen, onClose, student }) => {
       onClose();
       setTimeout(() => {
         window.location.reload();
-      }, 5000); // Wait for toast to show before reloading
+      }, 3000);
     } catch (error) {
       toast.error(
         "Update failed: " + (error.response?.data?.error || "An error occurred")
@@ -198,6 +236,41 @@ const EditStudentPopup = ({ isOpen, onClose, student }) => {
                   placeholder="Enter new password (optional)"
                 />
               </div>
+
+              <div className="space-y-2">
+                          <label className="text-sm text-[#b1aebb] font-medium">
+                            Profile Image
+                          </label>
+                          {formData.image ? (
+                            <div className="relative w-32 h-32 rounded-xl overflow-hidden shadow-md border border-[#5f43b2]">
+                              <img
+                                src={formData.image}
+                                alt="Profile"
+                                className="w-full h-full object-cover rounded-xl"
+                              />
+                              <button
+                                type="button"
+                                onClick={handleImageRemove}
+                                className="absolute top-1 right-1 text-red-500 hover:text-red-700 p-1.5 rounded-md transition-colors hover:cursor-pointer"
+                                title="Remove Image"
+                              >
+                                <Trash2 size={20} />
+                              </button>
+                            </div>
+                          ) : (
+                            <label className="block w-full cursor-pointer">
+                              <input
+                                type="file"
+                                accept="image/*"
+                                onChange={handleImageUpload}
+                                className="hidden"
+                              />
+                              <div className="w-full p-3 text-center text-sm bg-[#1e1e2f] border-2 border-dashed border-[#5f43b2] rounded-lg hover:border-[#7c5dfa] hover:bg-[#26263d] transition-all">
+                                Click to upload image
+                              </div>
+                            </label>
+                          )}
+                        </div>
 
               <div className="space-y-1">
                 <label className="text-sm text-[#b1aebb]">Batch</label>
