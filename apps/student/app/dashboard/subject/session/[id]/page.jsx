@@ -154,22 +154,6 @@ const SessionPage = () => {
               </div>
             </motion.div>
           </div>
-
-          {/* Bottom navigation or action section */}
-          <motion.div
-            variants={itemVariants}
-            className="flex justify-center mt-4"
-          >
-            <motion.button
-              className="bg-[#5f43b2] hover:bg-[#5f43b2]/80 px-6 py-3 rounded-full text-[#fefdfd] font-medium"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              transition={{ type: "spring", stiffness: 400, damping: 10 }}
-              onClick={() => window.history.back()}
-            >
-              Return to Subject
-            </motion.button>
-          </motion.div>
         </motion.div>
       </div>
       

@@ -7,6 +7,7 @@ import { authOptions } from "../../../lib/auth";
 export async function POST(req) {
   try {
     const { session_id } = await req.json();
+    console.log("The session id is : ", session_id);
 
     if (!session_id) {
       return NextResponse.json({ error: "Missing session_id" }, { status: 400 });
@@ -26,11 +27,22 @@ export async function POST(req) {
       return NextResponse.json({ error: "Student not found" }, { status: 404 });
     }
 
-    const assignment = await prisma.assignment.findUnique({
+    const newSession = await prisma.session.findUnique({
       where: { id: session_id },
     });
 
-    const assignment_id = assignment?.id;
+    const assignment_id = newSession?.assignment_id;
+    
+    if (!assignment_id) {
+      return NextResponse.json({ error: "Assignment not found" }, { status: 201 });
+    }
+
+    const assignment = await prisma.assignment.findUnique({
+      where: { id: assignment_id },
+    });
+
+    // console.log("The assignment is : ", assignment);
+
 
     //get the submissions array for that particular assignment
     const submission = await prisma.submission.findFirst({
@@ -40,10 +52,10 @@ export async function POST(req) {
       },
     });
 
-    //console.log("The submission is : ", submission);
+    // console.log("The submission is : ", submission);
 
     if (!submission) {
-      return NextResponse.json({ error: "Submission not found" }, { status: 404 });
+      return NextResponse.json({ error: "Submission not found" }, { status: 201 });
     }
 
     return NextResponse.json(submission, { status: 200 });
