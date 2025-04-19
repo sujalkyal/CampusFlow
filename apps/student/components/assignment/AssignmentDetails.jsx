@@ -110,18 +110,6 @@ export default function AssignmentDetails() {
           </div>
         </motion.div>
       </div>
-
-      {/* Assignment Status */}
-      <motion.div 
-        className="mt-6 bg-[#5f43b2]/10 border border-[#5f43b2]/20 rounded-lg p-3 flex items-center justify-between"
-        whileHover={{ scale: 1.01 }}
-      >
-        <div className="flex items-center">
-          <div className="w-2 h-2 bg-[#5f43b2] rounded-full mr-2"></div>
-          <span className="text-sm text-[#fefdfd]">Active Assignment</span>
-        </div>
-        <span className="text-xs text-[#b1aebb]">Submit before due date</span>
-      </motion.div>
     </motion.div>
   );
 }

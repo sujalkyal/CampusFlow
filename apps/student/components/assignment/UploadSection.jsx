@@ -14,6 +14,7 @@ export default function FilesUploadSection() {
   const [deleteFiles, setDeleteFiles] = useState([]);
   const [submissionId, setSubmissionId] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [assignmentNotFound, setAssignmentNotFound] = useState(false); // New state
   const fileInputRef = useRef(null);
 
   const { edgestore } = useEdgeStore();
@@ -26,6 +27,11 @@ export default function FilesUploadSection() {
         const res = await axios.post("/api/student/getSubmission", {
           session_id: sessionId,
         });
+
+        if (res.data.error === "Assignment not found") {
+          setAssignmentNotFound(true); // Set state if assignment is not found
+          return;
+        }
 
         if (res.data.id) {
           setSubmissionId(res.data.id);
@@ -72,12 +78,9 @@ export default function FilesUploadSection() {
   };
 
   const handleDelete = (file) => {
-    //remove the file from the list of files
     setFiles((prev) => prev.filter((f) => f !== file));
-    //add the file to the list of files to be deleted
     setDeleteFiles((prev) => [...prev, file]);
-    //show success message
-    toast.success("File deleted successfully!");
+    toast.success("File removed!");
   };
 
   const handleSubmit = async () => {
@@ -98,6 +101,7 @@ export default function FilesUploadSection() {
 
       toast.success("Files updated successfully!");
     } catch (error) {
+      toast.error("Failed to update files");
       console.error("Error:", error);
     }
   };
@@ -117,7 +121,6 @@ export default function FilesUploadSection() {
       }
 
       setFiles((prev) => [...prev, ...uploadedFiles]);
-
     } catch (error) {
       toast.error("Upload failed");
       console.error(error);
@@ -129,8 +132,8 @@ export default function FilesUploadSection() {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      transition: { staggerChildren: 0.05 }
-    }
+      transition: { staggerChildren: 0.05 },
+    },
   };
 
   const itemVariants = {
@@ -138,8 +141,8 @@ export default function FilesUploadSection() {
     visible: {
       opacity: 1,
       y: 0,
-      transition: { type: "spring", stiffness: 300 }
-    }
+      transition: { type: "spring", stiffness: 300 },
+    },
   };
 
   if (loading) {
@@ -150,6 +153,15 @@ export default function FilesUploadSection() {
           animate={{ rotate: 360 }}
           transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
         />
+      </div>
+    );
+  }
+
+  if (assignmentNotFound) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12 bg-[#3a3153]/20 rounded-lg">
+        <AlertCircle className="w-12 h-12 text-[#5f43b2]/70 mb-3" />
+        <p className="text-[#b1aebb] mb-4">Assignment not found for this session.</p>
       </div>
     );
   }
@@ -188,7 +200,7 @@ export default function FilesUploadSection() {
               >
                 {files.map((file, index) => {
                   const fileName = decodeURIComponent(file.split("/").pop());
-                  
+
                   return (
                     <motion.div
                       key={index}
@@ -246,7 +258,7 @@ export default function FilesUploadSection() {
           </AnimatePresence>
 
           <div className="space-y-4">
-            <motion.label 
+            <motion.label
               className="w-full h-28 border border-dashed border-[#5f43b2]/50 flex flex-col items-center justify-center rounded-lg cursor-pointer hover:bg-[#5f43b2]/10 transition-colors"
               whileHover={{ scale: 1.01, borderColor: "#5f43b2" }}
               whileTap={{ scale: 0.99 }}
@@ -301,9 +313,9 @@ export default function FilesUploadSection() {
         </motion.div>
       )}
 
-      <ToastContainer 
-        position="top-right" 
-        autoClose={3000} 
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
         hideProgressBar={false}
         newestOnTop
         closeOnClick
