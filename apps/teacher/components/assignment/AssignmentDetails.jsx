@@ -153,7 +153,16 @@ export default function AssignmentDetails() {
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-medium text-[#fefcfd] ">Edit Assignment Details</h3>
                 <motion.button 
-                  onClick={() => setIsModalOpen(false)} 
+                  onClick={() => {
+                      setIsModalOpen(false)
+                      setFormData({
+                        title: "",
+                        dueDate: "",
+                        instructions: "",
+                        totalPoints: ""
+                      })
+                    }
+                  } 
                   className="text-[#b1aebb] hover:text-[#fefcfd] p-1 rounded hover:cursor-pointer"
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
@@ -188,9 +197,6 @@ export default function AssignmentDetails() {
                     onChange={handleChange}
                     className="w-full px-3 py-2 bg-[#010101] border border-[#3a3153] rounded focus:outline-none focus:ring-1 focus:ring-[#5f43b2] text-[#fefcfd] calendar-dark"
                     required
-                    style={{
-                      colorScheme: 'dark'
-                    }}
                   />
                 </div>
   
@@ -222,7 +228,16 @@ export default function AssignmentDetails() {
                 <div className="flex justify-end space-x-3 mt-6">
                   <motion.button
                     type="button"
-                    onClick={() => setIsModalOpen(false)}
+                    onClick={() => {
+                      setIsModalOpen(false)
+                      setFormData({
+                        title: "",
+                        dueDate: "",
+                        instructions: "",
+                        totalPoints: ""
+                      })
+                    }
+                  } 
                     className="px-4 py-2 bg-[#010101] border border-[#3a3153] rounded text-sm font-medium text-[#b1aebb] hover:text-[#fefcfd] shadow-sm hover:cursor-pointer"
                     whileHover={{ backgroundColor: "#010101", scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
