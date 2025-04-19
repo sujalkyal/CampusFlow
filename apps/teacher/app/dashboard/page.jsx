@@ -265,7 +265,7 @@ const SubjectDashboard = () => {
                       <div className="p-4 flex-grow flex flex-col justify-between">
                         <div>
                           <h3 className="font-semibold text-lg text-[#fefdfd] mb-2">{session.subject_name}</h3>
-                          <p className="text-[#b1aebb] text-sm">ID: {session.subject_id}</p>
+                          <p className="text-[#b1aebb] text-sm"> Title: {session.title ? session.title : "Untitled"}</p>
                         </div>
                         <motion.button 
                           className="mt-4 w-full py-2 bg-[#010101]/80 text-[#fefdfd] rounded-md text-sm hover:cursor-pointer"
