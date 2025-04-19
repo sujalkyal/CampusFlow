@@ -199,60 +199,54 @@ export default function FilesUploadSection() {
                 className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6"
               >
                 {files.map((file, index) => {
-                  const fileName = decodeURIComponent(file.split("/").pop());
+  const fileName = decodeURIComponent(file.split("/").pop());
 
-                  return (
-                    <motion.div
-                      key={index}
-                      variants={itemVariants}
-                      className="relative bg-[#3a3153]/30 backdrop-blur-sm border border-[#5f43b2]/20 rounded-lg overflow-hidden group"
-                      whileHover={{ y: -4, backgroundColor: "rgba(58, 49, 83, 0.5)" }}
-                    >
-                      <div className="h-24 overflow-hidden">
-                        {/\.(jpeg|jpg|png|gif|webp)$/i.test(file) ? (
-                          <motion.img
-                            src={file}
-                            alt="Uploaded"
-                            className="w-full h-full object-cover cursor-pointer"
-                            onClick={() => window.open(file, "_blank")}
-                            whileHover={{ scale: 1.05 }}
-                            transition={{ duration: 0.2 }}
-                          />
-                        ) : file.endsWith(".pdf") ? (
-                          <div className="relative w-full h-full bg-[#010101]/60">
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <Upload className="w-8 h-8 text-[#5f43b2]/80" />
-                            </div>
-                            <iframe
-                              src={file}
-                              className="w-full h-full opacity-50 hover:opacity-70 transition-opacity cursor-pointer"
-                              title="PDF File"
-                              onClick={() => window.open(file, "_blank")}
-                            />
-                          </div>
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center bg-[#3a3153]/50">
-                            <Upload className="w-10 h-10 text-[#b1aebb]/50" />
-                          </div>
-                        )}
-                      </div>
+  return (
+    <motion.div
+      key={index}
+      variants={itemVariants}
+      className="relative bg-[#3a3153]/30 backdrop-blur-sm border border-[#5f43b2]/20 rounded-lg overflow-hidden group"
+      whileHover={{ y: -4, backgroundColor: "rgba(58, 49, 83, 0.5)" }}
+    >
+      <div className="h-24 overflow-hidden cursor-pointer" onClick={() => window.open(file, "_blank")}>
+        {/\.(jpeg|jpg|png|gif|webp)$/i.test(file) ? (
+          <motion.img
+            src={file}
+            alt="Uploaded"
+            className="w-full h-full object-cover"
+            whileHover={{ scale: 1.05 }}
+            transition={{ duration: 0.2 }}
+          />
+        ) : file.endsWith(".pdf") ? (
+          <iframe
+            src={file}
+            className="w-full h-full opacity-70 hover:opacity-90 transition-opacity"
+            title="PDF File"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-[#3a3153]/50">
+            <Upload className="w-10 h-10 text-[#b1aebb]/50" />
+          </div>
+        )}
+      </div>
 
-                      <div className="p-2 flex items-center justify-between">
-                        <p className="text-xs text-[#fefdfd] truncate max-w-[120px]">
-                          {fileName}
-                        </p>
-                        <motion.button
-                          onClick={() => handleDelete(file)}
-                          className="text-red-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
-                          whileHover={{ scale: 1.2 }}
-                          whileTap={{ scale: 0.9 }}
-                        >
-                          <Trash2 size={16} />
-                        </motion.button>
-                      </div>
-                    </motion.div>
-                  );
-                })}
+      <div className="p-2 flex items-center justify-between">
+        <p className="text-xs text-[#fefdfd] truncate max-w-[120px]">
+          {fileName}
+        </p>
+        <motion.button
+          onClick={() => handleDelete(file)}
+          className="text-red-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity hover:cursor-pointer"
+          whileHover={{ scale: 1.2 }}
+          whileTap={{ scale: 0.9 }}
+        >
+          <Trash2 size={16} />
+        </motion.button>
+      </div>
+    </motion.div>
+  );
+})}
+
               </motion.div>
             )}
           </AnimatePresence>
@@ -282,7 +276,7 @@ export default function FilesUploadSection() {
             >
               <motion.button
                 onClick={handleSubmit}
-                className="bg-[#5f43b2] hover:bg-[#5f43b2]/80 px-5 py-2.5 rounded-full flex items-center"
+                className="bg-[#5f43b2] hover:bg-[#5f43b2]/80 px-5 py-2.5 rounded-full flex items-center hover:cursor-pointer"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 transition={{ type: "spring", stiffness: 400, damping: 10 }}
