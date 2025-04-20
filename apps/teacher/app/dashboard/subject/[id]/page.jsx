@@ -4,6 +4,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowLeft } from 'lucide-react';
 import NotesViewPopUp from '../../../../components/NotesViewPopUp';
 import AddSessionCard from '../../../../components/AddSessionComponent';
 import AddNoteCard from '../../../../components/AddNotesComponent';
@@ -20,6 +21,9 @@ const Subject = () => {
   };
 
   const { id: subject_id } = useParams();
+  const [subjectName, setSubjectName] = useState(null);
+  const [batchName, setBatchName] = useState(null);
+  const [deptName, setDeptName] = useState(null);
   const [sessions, setSessions] = useState([]);
   const [notes, setNotes] = useState([]);
   const [students, setStudents] = useState([]);
@@ -33,12 +37,31 @@ const Subject = () => {
   const handleSessionCreated = () => setRefresh((prev) => !prev);
   const handleNoteCreation = () => setRefresh2((prev) => !prev);
 
+  const fetchBatch = async () => {
+    try {
+      const response = await axios.post('/api/batch/getBatchFromSubject', { subject_id: subject_id });
+      setSubjectName(response.data.subject.name);
+      setBatchName(response.data.batchName);
+      setDeptName(response.data.deptName);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching batch:', error);
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (subject_id) {
+      fetchBatch();
+    }
+  }, [subject_id]);
+
   // Animation variants
   const containerVariants = {
     hidden: { opacity: 0 },
-    visible: { 
+    visible: {
       opacity: 1,
-      transition: { 
+      transition: {
         staggerChildren: 0.1,
         delayChildren: 0.2
       }
@@ -47,8 +70,8 @@ const Subject = () => {
 
   const itemVariants = {
     hidden: { y: 20, opacity: 0 },
-    visible: { 
-      y: 0, 
+    visible: {
+      y: 0,
       opacity: 1,
       transition: { type: "spring", stiffness: 100 }
     }
@@ -99,6 +122,18 @@ const Subject = () => {
     );
   }
 
+  const headerVariants = {
+    hidden: { opacity: 0, y: -20 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: { 
+        duration: 0.6,
+        ease: "easeOut" 
+      }
+    }
+  };
+
   return (
     <motion.div
       className="flex flex-col min-h-screen px-4 md:px-8 py-8 text-white"
@@ -107,7 +142,34 @@ const Subject = () => {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.6 }}
     >
-      <motion.main 
+        <motion.header
+      className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-10 px-2 py-4 border-b border-indigo-100 dark:border-indigo-900"
+      variants={headerVariants}
+      initial="hidden"
+      animate="visible"
+    >
+      <div className="flex flex-col">
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-purple-500 via-indigo-500 to-purple-400 bg-clip-text text-transparent py-1">
+          {subjectName}
+        </h1>
+        <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 mt-1">
+          {batchName} • <span className="font-medium">{deptName}</span>
+        </p>
+      </div>
+      
+      <motion.button
+        className="group flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-purple-500 to-indigo-600 text-white font-medium shadow-md hover:shadow-lg hover:from-purple-600 hover:to-indigo-700 transition-all duration-300 ease-in-out"
+        onClick={() => router.push('/dashboard')}
+        whileHover={{ scale: 1.03 }}
+        whileTap={{ scale: 0.98 }}
+      >
+        <ArrowLeft size={18} className="transition-transform group-hover:-translate-x-1" />
+        <span>Dashboard</span>
+      </motion.button>
+    </motion.header>
+
+
+      <motion.main
         className="flex-1 flex flex-col gap-8"
         variants={containerVariants}
         initial="hidden"
@@ -129,7 +191,7 @@ const Subject = () => {
           </div>
 
           {sessions.length === 0 ? (
-            <motion.div 
+            <motion.div
               className="flex flex-col items-center justify-center p-8 rounded-xl border border-dashed"
               style={{ borderColor: themeColors.accent, backgroundColor: 'rgba(58, 49, 83, 0.2)' }}
               initial={{ opacity: 0 }}
@@ -160,17 +222,17 @@ const Subject = () => {
                       {session.title || 'Untitled Session'}
                     </h3>
                     <p className="text-sm" style={{ color: themeColors.faded }}>
-                      {new Date(session.date).toLocaleDateString('en-US', { 
-                        weekday: 'short', 
-                        month: 'short', 
-                        day: 'numeric' 
+                      {new Date(session.date).toLocaleDateString('en-US', {
+                        weekday: 'short',
+                        month: 'short',
+                        day: 'numeric'
                       })}
                     </p>
                   </div>
                   <div className="h-1.5" style={{ backgroundColor: themeColors.primary, opacity: 0.7 }}></div>
                 </motion.div>
               ))}
-              <motion.div 
+              <motion.div
                 className="flex-shrink-0 w-64 flex items-center justify-center"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -181,7 +243,7 @@ const Subject = () => {
             </div>
           )}
         </motion.section>
-        
+
         {/* Divider */}
         <motion.div
           className="h-1 bg-gradient-to-r from-purple-400 to-indigo-500 rounded-full"
@@ -205,8 +267,8 @@ const Subject = () => {
           </div>
           <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar rounded-xl">
             {students.map((student, index) => (
-              <motion.div 
-                key={student.id} 
+              <motion.div
+                key={student.id}
                 className="flex items-center justify-between p-3 rounded-xl"
                 style={{ backgroundColor: 'rgba(58, 49, 83, 0.3)' }}
                 initial={{ opacity: 0, x: -20 }}
@@ -227,7 +289,7 @@ const Subject = () => {
                   </div>
                 </div>
                 <div className="flex items-center">
-                  <motion.div 
+                  <motion.div
                     className="px-3 py-1 rounded-full"
                     style={{ backgroundColor: themeColors.primary }}
                     whileHover={{ scale: 1.05 }}
@@ -279,7 +341,7 @@ const Subject = () => {
                 <p className="text-sm mt-2" style={{ color: themeColors.faded }}>{note.description || 'No description available'}</p>
               </motion.div>
             ))}
-            <motion.div 
+            <motion.div
               whileHover={{ scale: 0.97 }}
               whileTap={{ scale: 0.97 }}
             >
@@ -291,9 +353,9 @@ const Subject = () => {
 
       <AnimatePresence>
         {selectedNote && (
-          <motion.div 
-            initial={{ opacity: 0 }} 
-            animate={{ opacity: 1 }} 
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
           >

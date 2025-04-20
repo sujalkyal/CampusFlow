@@ -2,7 +2,7 @@
 import React from "react";
 import axios from 'axios';
 import { useEffect, useState } from 'react';
-import { CheckCircle, XCircle, Clock, BookOpen, ArrowRight } from "lucide-react";
+import { CheckCircle, XCircle, Clock, BookOpen, ArrowRight, Loader } from "lucide-react";
 import { useRouter, useParams } from 'next/navigation';
 import { motion } from "framer-motion";
 
@@ -15,6 +15,7 @@ const AttendanceTable = () => {
     const [attendance, setAttendance] = useState({});
     const [deptName, setDeptName] = useState(null);
     const [attendanceDetails, setAttendanceDetails] = useState({});
+    const [loading, setLoading] = useState(true);
     const router = useRouter();
 
     const fetchSession = async () => {
@@ -63,8 +64,10 @@ const AttendanceTable = () => {
             setBatchName(response.data.batchName);
             setStudents(response.data.students || []);
             setDeptName(response.data.deptName);
+            setLoading(false);
         } catch (error) {
             console.error('Error fetching batch:', error);
+            setLoading(false);
         }
     };
 
@@ -152,24 +155,40 @@ const AttendanceTable = () => {
         hidden: { y: 20, opacity: 0 },
         visible: { y: 0, opacity: 1, transition: { type: "spring", stiffness: 100 } }
     };
+    
+    // Show loading state
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-[#010101] flex items-center justify-center">
+                <div className="flex flex-col items-center">
+                    <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                        className="w-10 h-10 border-2 border-[#5f43b2] border-t-transparent rounded-full mb-4"
+                    />
+                    <p className="text-[#b1aebb]">Loading attendance data...</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-[#010101] text-[#fefcfd] p-4 md:p-6">
-            <motion.div 
+            <motion.div
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
                 className="mb-8"
             >
-                <div className="bg-[#3a3153] rounded-xl p-6 shadow-lg border border-[#5f43b2]/30">
-                    <h2 className="text-2xl font-bold mb-4 text-[#fefcfd]">{subjectName}</h2>
-                    <div className="flex flex-col space-y-2">
+                <div className="bg-gradient-to-r from-[#3a3153] to-[#5f43b2] rounded-2xl p-8 shadow-lg border border-[#5f43b2]/30">
+                    <h2 className="text-3xl font-extrabold mb-4 text-[#fefcfd]">{subjectName}</h2>
+                    <div className="flex flex-col space-y-3">
                         <div className="flex items-center">
-                            <span className="text-[#b1aebb] w-24">Department:</span>
+                            <span className="text-[#b1aebb] w-28">Department:</span>
                             <span className="font-medium text-[#fefcfd]">{deptName}</span>
                         </div>
                         <div className="flex items-center">
-                            <span className="text-[#b1aebb] w-24">Batch:</span>
+                            <span className="text-[#b1aebb] w-28">Batch:</span>
                             <span className="font-medium text-[#fefcfd]">{batchName}</span>
                         </div>
                     </div>
