@@ -60,10 +60,10 @@ const AddSessionCard = ({ subject_id, onSessionCreated }) => {
             className="w-full h-full p-4 rounded-xl border-2 border-dashed flex flex-col items-center justify-center transition-colors duration-300 hover:cursor-pointer"
             style={{ 
               borderColor: themeColors.accent,
-              backgroundColor: 'rgba(58, 49, 83, 0.2)',
+              backgroundColor: themeColors.card,
               minHeight: '100px'
             }}
-            whileHover={{ backgroundColor: 'rgba(58, 49, 83, 0.4)' }}
+            whileHover={{ backgroundColor: themeColors.card }}
           >
             <Plus size={24} color={themeColors.primary} />
             <span className="mt-2 text-sm font-medium" style={{ color: themeColors.faded }}>Add Session</span>
@@ -71,22 +71,41 @@ const AddSessionCard = ({ subject_id, onSessionCreated }) => {
         )}
       </motion.div>
 
+      {/* Modal Portal */}
       <AnimatePresence>
         {showPopup && (
-          <motion.div 
-            className="fixed top-0 left-0 w-screen h-screen z-[9999] flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
+          <div 
+            className="fixed inset-0 flex items-center justify-center z-50"
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0
+            }}
           >
+            {/* Dark overlay for the background */}
             <motion.div 
-              className="rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto"
-              style={{ backgroundColor: themeColors.card, backdropFilter: 'blur(10px)' }}
+              className="fixed inset-0 bg-black bg-opacity-90 backdrop-blur-lg"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={handleClosePopup}
+            />
+            
+            {/* Modal content with solid background */}
+            <motion.div 
+              className="rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto relative z-[60]"
+              style={{ 
+                backgroundColor: '#1f1e2e',
+                boxShadow: '0 0 30px rgba(0,0,0,0.5)',
+                border: `2px solid ${themeColors.primary}`
+              }}
               initial={{ scale: 0.9, y: 20, opacity: 0 }}
               animate={{ scale: 1, y: 0, opacity: 1 }}
               exit={{ scale: 0.9, y: 20, opacity: 0 }}
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              onClick={(e) => e.stopPropagation()}
             >
               <div className="p-6">
                 <h2 
@@ -108,7 +127,7 @@ const AddSessionCard = ({ subject_id, onSessionCreated }) => {
                       onChange={(e) => setTitle(e.target.value)}
                       className="w-full p-3 rounded-lg focus:outline-none focus:ring-2 transition-all duration-300"
                       style={{ 
-                        backgroundColor: 'rgba(58, 49, 83, 0.4)', 
+                        backgroundColor: '#252338',
                         color: themeColors.text,
                         border: `1px solid ${themeColors.accent}`
                       }}
@@ -125,7 +144,7 @@ const AddSessionCard = ({ subject_id, onSessionCreated }) => {
                       onChange={(e) => setDateTime(e.target.value)}
                       className="w-full p-3 rounded-lg focus:outline-none focus:ring-2 transition-all duration-300"
                       style={{ 
-                        backgroundColor: 'rgba(58, 49, 83, 0.4)', 
+                        backgroundColor: '#252338',
                         color: themeColors.text,
                         border: `1px solid ${themeColors.accent}`
                       }}
@@ -138,8 +157,8 @@ const AddSessionCard = ({ subject_id, onSessionCreated }) => {
                   <motion.button 
                     onClick={handleClosePopup}
                     className="px-5 py-2 rounded-lg hover:cursor-pointer"
-                    style={{ backgroundColor: 'rgba(58, 49, 83, 0.6)', color: themeColors.text }}
-                    whileHover={{ scale: 1.05, backgroundColor: 'rgba(58, 49, 83, 0.8)' }}
+                    style={{ backgroundColor: '#2a2941', color: themeColors.text }}
+                    whileHover={{ scale: 1.05, backgroundColor: '#3a3953' }}
                     whileTap={{ scale: 0.95 }}
                   >
                     Cancel
@@ -157,7 +176,7 @@ const AddSessionCard = ({ subject_id, onSessionCreated }) => {
                 </div>
               </div>
             </motion.div>
-          </motion.div>
+          </div>
         )}
       </AnimatePresence>
 
@@ -169,6 +188,7 @@ const AddSessionCard = ({ subject_id, onSessionCreated }) => {
           backgroundColor: themeColors.card,
           color: themeColors.text
         }}
+        style={{ zIndex: 61 }}
       />
     </>
   );
