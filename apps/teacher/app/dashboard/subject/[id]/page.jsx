@@ -4,7 +4,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Plus } from 'lucide-react';
 import NotesViewPopUp from '../../../../components/NotesViewPopUp';
 import AddSessionCard from '../../../../components/AddSessionComponent';
 import AddNoteCard from '../../../../components/AddNotesComponent';
@@ -30,12 +30,16 @@ const Subject = () => {
   const [selectedNote, setSelectedNote] = useState(null);
   const [refresh, setRefresh] = useState(false);
   const [refresh2, setRefresh2] = useState(false);
+  const [showAddNoteForm, setShowAddNoteForm] = useState(false);
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [totalClasses, setTotalClasses] = useState(0);
 
   const handleSessionCreated = () => setRefresh((prev) => !prev);
-  const handleNoteCreation = () => setRefresh2((prev) => !prev);
+  const handleNoteCreation = () => {
+    setRefresh2((prev) => !prev);
+    setShowAddNoteForm(false);
+  };
 
   const fetchBatch = async () => {
     try {
@@ -142,31 +146,31 @@ const Subject = () => {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.6 }}
     >
-        <motion.header
-      className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-10 px-2 py-4 border-b border-indigo-100 dark:border-indigo-900"
-      variants={headerVariants}
-      initial="hidden"
-      animate="visible"
-    >
-      <div className="flex flex-col">
-        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-purple-500 via-indigo-500 to-purple-400 bg-clip-text text-transparent py-1">
-          {subjectName}
-        </h1>
-        <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 mt-1">
-          {batchName} • <span className="font-medium">{deptName}</span>
-        </p>
-      </div>
-      
-      <motion.button
-        className="group flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-purple-500 to-indigo-600 text-white font-medium shadow-md hover:shadow-lg hover:from-purple-600 hover:to-indigo-700 transition-all duration-300 ease-in-out"
-        onClick={() => router.push('/dashboard')}
-        whileHover={{ scale: 1.03 }}
-        whileTap={{ scale: 0.98 }}
+      <motion.header
+        className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-10 px-2 py-4 border-b border-indigo-100 dark:border-indigo-900"
+        variants={headerVariants}
+        initial="hidden"
+        animate="visible"
       >
-        <ArrowLeft size={18} className="transition-transform group-hover:-translate-x-1" />
-        <span>Dashboard</span>
-      </motion.button>
-    </motion.header>
+        <div className="flex flex-col">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-purple-500 via-indigo-500 to-purple-400 bg-clip-text text-transparent py-1">
+            {subjectName}
+          </h1>
+          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 mt-1">
+            {batchName} • <span className="font-medium">{deptName}</span>
+          </p>
+        </div>
+        
+        <motion.button
+          className="group flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-purple-500 to-indigo-600 text-white font-medium shadow-md hover:shadow-lg hover:from-purple-600 hover:to-indigo-700 transition-all duration-300 ease-in-out"
+          onClick={() => router.push('/dashboard')}
+          whileHover={{ scale: 1.03 }}
+          whileTap={{ scale: 0.98 }}
+        >
+          <ArrowLeft size={18} className="transition-transform group-hover:-translate-x-1" />
+          <span>Dashboard</span>
+        </motion.button>
+      </motion.header>
 
 
       <motion.main
@@ -191,15 +195,11 @@ const Subject = () => {
           </div>
 
           {sessions.length === 0 ? (
-            <motion.div
-              className="flex flex-col items-center justify-center p-8 rounded-xl border border-dashed"
-              style={{ borderColor: themeColors.accent, backgroundColor: 'rgba(58, 49, 83, 0.2)' }}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-            >
-              <p className="text-center mb-3" style={{ color: themeColors.faded }}>No classes have been scheduled yet</p>
-              <AddSessionCard subject_id={subject_id} onSessionCreated={handleSessionCreated} />
-            </motion.div>
+            <div className="h-24 flex items-center justify-center">
+              <div className="w-64">
+                <AddSessionCard subject_id={subject_id} onSessionCreated={handleSessionCreated} />
+              </div>
+            </div>
           ) : (
             <div className="flex flex-nowrap overflow-x-auto gap-4 pb-4 custom-scrollbar">
               {sessions.map((session, index) => (
@@ -232,14 +232,10 @@ const Subject = () => {
                   <div className="h-1.5" style={{ backgroundColor: themeColors.primary, opacity: 0.7 }}></div>
                 </motion.div>
               ))}
-              <motion.div
-                className="flex-shrink-0 w-64 flex items-center justify-center"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: sessions.length * 0.08 + 0.1 }}
-              >
+              {/* Add Session Card */}
+              <div className="flex-shrink-0 w-64">
                 <AddSessionCard subject_id={subject_id} onSessionCreated={handleSessionCreated} />
-              </motion.div>
+              </div>
             </div>
           )}
         </motion.section>
@@ -322,35 +318,59 @@ const Subject = () => {
           variants={itemVariants}
         >
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-semibold bg-gradient-to-r from-purple-400 to-indigo-500 bg-clip-text text-transparent">Notes</h2>
+            <div>
+              <h2 className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-indigo-500 bg-clip-text text-transparent">Notes</h2>
+              <p className="text-sm mt-1" style={{ color: themeColors.faded }}>
+                {notes.length} {notes.length === 1 ? 'note' : 'notes'} available
+              </p>
+            </div>
+            
+            {/* Add Note Button */}
+            <motion.button
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-purple-500 to-indigo-600 text-white font-medium shadow-md hover:shadow-lg transition-all duration-300 hover:cursor-pointer"
+              onClick={() => setShowAddNoteForm(true)}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <Plus size={18} />
+              <span>Add Note</span>
+            </motion.button>
           </div>
-          <div className="flex flex-col gap-4">
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {notes.map((note, index) => (
               <motion.div
                 key={note.id}
-                className="p-4 rounded-xl border cursor-pointer"
-                style={{ backgroundColor: themeColors.accent, backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)' }}
+                className="p-5 rounded-2xl border shadow-sm cursor-pointer transition-all"
+                style={{
+                  backgroundColor: themeColors.accent,
+                  backdropFilter: 'blur(8px)',
+                  WebkitBackdropFilter: 'blur(8px)',
+                  borderColor: themeColors.primary,
+                }}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.05 }}
-                whileHover={{ scale: 0.98 }}
+                whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => setSelectedNote(note)}
               >
-                <h3 className="font-semibold" style={{ color: themeColors.text }}>{note.title || 'Untitled Note'}</h3>
-                <p className="text-sm mt-2" style={{ color: themeColors.faded }}>{note.description || 'No description available'}</p>
+                <h3 className="text-lg font-semibold mb-1" style={{ color: themeColors.text }}>
+                  {note.title || 'Untitled Note'}
+                </h3>
+                <p className="text-sm line-clamp-3" style={{ color: themeColors.faded }}>
+                  {note.description || 'No description available'}
+                </p>
+                <span className="inline-block text-xs mt-4 px-2 py-0.5 rounded bg-purple-500 text-white">
+                  View Note
+                </span>
               </motion.div>
             ))}
-            <motion.div
-              whileHover={{ scale: 0.97 }}
-              whileTap={{ scale: 0.97 }}
-            >
-              <AddNoteCard subject_id={subject_id} onNoteCreated={handleNoteCreation} />
-            </motion.div>
           </div>
         </motion.section>
       </motion.main>
 
+      {/* Note View Modal */}
       <AnimatePresence>
         {selectedNote && (
           <motion.div
@@ -358,9 +378,32 @@ const Subject = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
+            className="fixed inset-0 z-40 bg-black bg-opacity-50 flex justify-center items-center"
           >
-            <NotesViewPopUp note={selectedNote} onClose={() => setSelectedNote(null)} />
+            <motion.div
+              className="w-full max-w-4xl max-h-[90vh] bg-white rounded-xl overflow-y-auto"
+              style={{
+                maxWidth: '800px',
+              }}
+              initial={{ y: '-100vh' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100vh' }}
+              transition={{ type: 'spring', stiffness: 100, damping: 25 }}
+            >
+              <NotesViewPopUp note={selectedNote} onClose={() => setSelectedNote(null)} />
+            </motion.div>
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Add Note Modal */}
+      <AnimatePresence>
+        {showAddNoteForm && (
+          <AddNoteCard 
+            subject_id={subject_id} 
+            onNoteCreated={handleNoteCreation} 
+            isModal={true} 
+          />
         )}
       </AnimatePresence>
     </motion.div>
