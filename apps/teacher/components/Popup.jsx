@@ -47,7 +47,8 @@ const EditTeacherPopup = ({ isOpen, onClose, teacher }) => {
 
   const handleImageRemove = async () => {
     try {
-      await edgestore.publicFiles.delete({ url: formData.image });
+      console.log("Removing image:", formData.image); // Debugging line
+      //await edgestore.publicFiles.delete({ url: formData.image });
       setFormData((prev) => ({ ...prev, image: "" }));
     } catch (error) {
       console.error("Image removal failed:", error);
@@ -65,9 +66,12 @@ const EditTeacherPopup = ({ isOpen, onClose, teacher }) => {
         dept_name: teacher.dept_name,
         dept_id: teacher.dept_id,
         batches: teacher.batches || [],
-        subjects: teacher.subjects.map((s) => s.id),
+        subjects: teacher.subjects,
         image: teacher.image || "",
       });
+
+      fetchBatches(teacher.dept_id); // fetch batches first
+      fetchSubjects(teacher.batches); // fetch subjects for these batches
     }
   }, [teacher]);
 
@@ -193,7 +197,7 @@ const EditTeacherPopup = ({ isOpen, onClose, teacher }) => {
         },
       });
     } catch (error) {
-      const errorMessage = error.response?.data?.error || "An error occurred";
+      const errorMessage = error.response?.data?.message || "An error occurred";
       console.error("Update failed:", errorMessage);
 
       toast.error(`Update failed: ${errorMessage}`, {
@@ -290,7 +294,7 @@ const EditTeacherPopup = ({ isOpen, onClose, teacher }) => {
             <label className="text-sm text-[#b1aebb] font-medium">
               Profile Image
             </label>
-            {formData.image ? (
+            {formData.image!=="" ? (
               <div className="relative w-32 h-32 rounded-xl overflow-hidden shadow-md border border-[#5f43b2]">
                 <img
                   src={formData.image}
