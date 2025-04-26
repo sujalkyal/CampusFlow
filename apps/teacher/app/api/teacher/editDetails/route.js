@@ -70,7 +70,7 @@ export async function POST(request) {
             data: {
                 name,
                 email,
-                image: image=="" ? teacher.image : image,
+                image: image=="" ? null : image,
                 password: hashedPassword,
                 dept_id: department.id,
                 batches: { set: filteredBatches },
