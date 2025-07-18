@@ -1,84 +1,121 @@
-# Turborepo starter
+# CampusFlow
 
-This Turborepo starter is maintained by the Turborepo core team.
+CampusFlow is a comprehensive college management platform designed to streamline academic and administrative processes for students and teachers. It features robust attendance tracking, assignment management, session scheduling, and secure authentication, all within a modern, responsive web interface. Built as a monorepo, CampusFlow ensures scalability and maintainability for multi-role campus operations.
 
-## Using this example
+## Features
 
-Run the following command:
+- **Role-Based Dashboards**: Distinct interfaces for students and teachers.
+- **Attendance Management**: Calendar and overview components for tracking and visualizing attendance.
+- **Assignment Workflow**: Upload, view, and manage assignments and submissions with file support.
+- **Session Scheduling**: Tools for adding, viewing, and managing academic sessions.
+- **Notes Section**: Collaborative note sharing and viewing.
+- **Authentication**: Secure sign-in and sign-up flows using NextAuth.
+- **Data Visualization**: Charts and graphs for insights using Recharts.
+- **File Storage**: Integrated EdgeStore for efficient file management.
+- **Responsive UI**: Built with Tailwind CSS and Framer Motion.
+- **Toast Notifications**: Real-time feedback using React Toastify.
+
+## Tech Stack
+
+**Frontend**
+- Next.js (React)
+- Tailwind CSS
+- Framer Motion
+- Lucide React (icons)
+- React Toastify
+- Recharts
+
+**Backend**
+- Next.js API routes
+- NextAuth (authentication)
+- EdgeStore (file storage)
+- Zod (validation)
+
+**Database**
+- Prisma ORM
+- PostgreSQL
+
+**Monorepo & Tooling**
+- Turborepo (monorepo management)
+- Prettier (code formatting)
+- ESLint (linting)
+- Day.js (date handling)
+- Axios (HTTP requests)
+- bcrypt (password hashing)
+
+**Deployment**
+- Vercel (recommended for Next.js apps)
+- Render, Railway (optional for backend/database)
+
+## Installation & Setup
 
 ```sh
-npx create-turbo@latest
+# 1. Clone the repository
+git clone https://github.com/sujalkyal/CampusFlow.git
+cd CampusFlow
+
+# 2. Install dependencies from the root
+npm install
+
+# 3. Set up environment variables
+# Copy the example env file and fill in values (e.g., DATABASE_URL, NEXTAUTH_SECRET, etc.)
+cp .env.example .env
+# Open and edit the .env file as needed
+
+# 4. Navigate to the database package and set up env + install dependencies
+cd packages/db
+
+# Copy environment variables to this directory too (if required by Prisma here)
+cp .env.example .env
+
+# Install dependencies in the db package
+npm install
+
+# Run Prisma migration and generate client
+npx prisma migrate dev --name init
+npx prisma generate
+
+# 5. Go back to root directory
+cd ../../
+
+# 6. Run the development server
+npm run dev
+
+# 7. (Optional) Build for production
+npm run build
 ```
 
-## What's inside?
+## Usage
 
-This Turborepo includes the following packages/apps:
+1. **Access the App**: Open the student or teacher app in your browser (`/apps/student` or `/apps/teacher`).
+2. **Authentication**: Sign up or sign in using your credentials.
+3. **Student Dashboard**: View attendance, upcoming sessions, assignments, and notes.
+4. **Teacher Dashboard**: Schedule sessions, manage assignments, view submissions, and share notes.
+5. **Demo Access**: If demo credentials are available, use:
+   - **Student**: `ayanroy@gmail.com` / `12345`
+   - **Teacher**: `ishu@gmail.com` / `12345`
 
-### Apps and Packages
+## Deployment
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+CampusFlow is optimized for deployment on [Vercel](https://vercel.com/) for seamless Next.js hosting. You can also deploy the backend and database on platforms like Render or Railway. For Prisma migrations, ensure your PostgreSQL database is accessible and environment variables are set.
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+- **Vercel**: [https://vercel.com/](https://vercel.com/)
+- **Render**: [https://render.com/](https://render.com/)
+- **Railway**: [https://railway.app/](https://railway.app/)
+- **Live Demo**: [Teacher-App](https://campusflow-teacher.vercel.app/) [Student-App](https://ecomm-user-app.vercel.app/)
 
-### Utilities
+## Author
 
-This Turborepo has some additional tools already setup for you:
+**Sujal Kyal**
+GitHub: [@sujalkyal](https://github.com/sujalkyal)
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+## License
 
-### Build
+This project is licensed under the [MIT License](LICENSE).
 
-To build all apps and packages, run the following command:
+## Contact
 
-```
-cd my-turborepo
-pnpm build
-```
+For questions, feedback, or support:
 
-### Develop
-
-To develop all apps and packages, run the following command:
-
-```
-cd my-turborepo
-pnpm dev
-```
-
-### Remote Caching
-
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo can use a technique known as [Remote Caching](https://turbo.build/repo/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-```
-cd my-turborepo
-npx turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-```
-npx turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turbo.build/repo/docs/core-concepts/monorepos/running-tasks)
-- [Caching](https://turbo.build/repo/docs/core-concepts/caching)
-- [Remote Caching](https://turbo.build/repo/docs/core-concepts/remote-caching)
-- [Filtering](https://turbo.build/repo/docs/core-concepts/monorepos/filtering)
-- [Configuration Options](https://turbo.build/repo/docs/reference/configuration)
-- [CLI Usage](https://turbo.build/repo/docs/reference/command-line-reference)
+- Website: [sujalkyal.dev.in](https://sujaldev-ten.vercel.app/)
+- Email: sujalkyal.dev@gmail.com
