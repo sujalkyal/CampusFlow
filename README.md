@@ -1,4 +1,4 @@
-# CampusFlow
+# CampusFlow(A campus management application)
 
 CampusFlow is a comprehensive college management platform designed to streamline academic and administrative processes for students and teachers. It features robust attendance tracking, assignment management, session scheduling, and secure authentication, all within a modern, responsive web interface. Built as a monorepo, CampusFlow ensures scalability and maintainability for multi-role campus operations.
 
